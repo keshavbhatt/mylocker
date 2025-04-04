@@ -9,17 +9,14 @@ class PasswordStorage : public QObject {
 public:
   static PasswordStorage &instance();
 
-  void addPasswordEntry(const QString &title, const QString &username,
-                        const QString &password);
+  void addPasswordEntry(const PasswordEntry &entry);
   void loadPasswords();
   void deletePasswordEntry(QUuid id);
 
 signals:
   void passwordsLoaded(QVector<PasswordEntry> entries);
   void operationFailed(const QString &error);
-
   void passwordAdded(PasswordEntry newEntry);
-
   void passwordDeleted(QUuid id);
   void deletionError(const QString &error);
 

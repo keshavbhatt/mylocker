@@ -23,8 +23,7 @@ struct PasswordEntry {
   // extended fields
   QString url;
   QString notes;
-  uint32_t category = 0;
-  uint32_t flags = 0;
+  QString category;
 
   PasswordEntry() : id(QUuid::createUuid()) {}
 };
@@ -35,17 +34,18 @@ public:
   explicit PasswordWorker(QObject *parent = nullptr);
 
 public slots:
-  void addEntry(const QString &title, const QString &username,
-                const QString &password);
   void loadEntries();
-
+  void addEntry(const PasswordEntry &entry);
   void deleteEntry(QUuid id);
+  void updateEntry(const PasswordEntry &updatedEntry);
+
 signals:
   void entriesLoaded(QVector<PasswordEntry> entries);
   void errorOccurred(QString message);
-  void entryDeleted(QUuid id);
   void deletionFailed(const QString &error);
+  void entryDeleted(QUuid id);
   void passwordAdded(PasswordEntry entry);
+  void passwordUpdated(const PasswordEntry &updatedEntry);
 
 private:
   QReadWriteLock m_lock;

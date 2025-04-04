@@ -1,17 +1,28 @@
 #include "passwordmanager.h"
+#include "addpassworddialog.h"
+#include "passwordcard.h"
 #include "ui_passwordmanager.h"
 
+#include <QCheckBox>
 #include <QClipboard>
+#include <QComboBox>
 #include <QDebug>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QScrollBar>
+#include <QTextEdit>
 #include <QVBoxLayout>
-
 #include <password/storage/passwordstorage.h>
+
+#include <categories/categorymanager.h>
 
 PasswordManager::PasswordManager(QWidget *parent)
     : QWidget(parent), ui(new Ui::PasswordManager) {
   ui->setupUi(this);
+
+  ui->scrollArea->verticalScrollBar()->setSingleStep(30);
+
+  ui->passwordsContainer->layout()->setAlignment(Qt::AlignTop);
 
   connect(&PasswordStorage::instance(), &PasswordStorage::passwordsLoaded, this,
           &PasswordManager::passwordsLoaded);
@@ -27,63 +38,19 @@ PasswordManager::PasswordManager(QWidget *parent)
   connect(ui->addPasswordButton, &QPushButton::clicked, this,
           &PasswordManager::addPasswordClicked);
 
-  ui->passwordsContainer->layout()->setAlignment(Qt::AlignTop);
-
   PasswordStorage::instance().loadPasswords();
 }
 
 void PasswordManager::addPasswordCardToUi(const PasswordEntry &entry) {
-  QFrame *card = createPasswordCard(entry);
+  PasswordCard *card = new PasswordCard(entry, this);
+  connect(card, &PasswordCard::deleteRequested, this,
+          &PasswordManager::confirmAndDeletePassword);
+
   card->setProperty("entryId", entry.id);
   card->setObjectName("card_" + entry.id.toString());
   card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+
   ui->passwordsContainer->layout()->addWidget(card);
-}
-
-QFrame *PasswordManager::createPasswordCard(const PasswordEntry &entry) {
-  QFrame *card = new QFrame();
-  QVBoxLayout *cardLayout = new QVBoxLayout(card);
-
-  QLabel *titleLabel = new QLabel("<b>" + entry.title + "</b>");
-  QLabel *userLabel = new QLabel("Username: " + entry.username);
-  QLabel *hiddenPassLabel = new QLabel("••••••••");
-
-  QPushButton *togglePassBtn = new QPushButton("Show");
-  QPushButton *copyBtn = new QPushButton("Copy");
-  QPushButton *deleteBtn = new QPushButton("Delete");
-
-  QHBoxLayout *buttonLayout = new QHBoxLayout();
-  buttonLayout->addWidget(togglePassBtn);
-  buttonLayout->addWidget(copyBtn);
-  buttonLayout->addWidget(deleteBtn);
-
-  cardLayout->addWidget(titleLabel);
-  cardLayout->addWidget(userLabel);
-  cardLayout->addWidget(hiddenPassLabel);
-  cardLayout->addLayout(buttonLayout);
-  card->setLayout(cardLayout);
-  card->setFrameStyle(QFrame::StyledPanel);
-
-  connect(togglePassBtn, &QPushButton::clicked, this,
-          [hiddenPassLabel, entry, togglePassBtn]() {
-            if (hiddenPassLabel->text() == "••••••••") {
-              hiddenPassLabel->setText(entry.password);
-              togglePassBtn->setText("Hide");
-            } else {
-              hiddenPassLabel->setText("••••••••");
-              togglePassBtn->setText("Show");
-            }
-          });
-
-  connect(copyBtn, &QPushButton::clicked, this, [entry]() {
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(entry.password);
-  });
-
-  connect(deleteBtn, &QPushButton::clicked, this,
-          [=]() { confirmAndDeletePassword(entry.id); });
-
-  return card;
 }
 
 void PasswordManager::confirmAndDeletePassword(QUuid id) {
@@ -140,39 +107,9 @@ void PasswordManager::updateStackWidget() {
 PasswordManager::~PasswordManager() { delete ui; }
 
 void PasswordManager::addPasswordClicked() {
-  QDialog dialog(this);
-  dialog.setWindowTitle("Add New Password");
-
-  QVBoxLayout layout(&dialog);
-
-  QLineEdit siteInput, usernameInput, passwordInput;
-  siteInput.setPlaceholderText("Enter Site/Service");
-  usernameInput.setPlaceholderText("Enter Username");
-  passwordInput.setPlaceholderText("Enter Password");
-  passwordInput.setEchoMode(QLineEdit::Password);
-
-  QPushButton saveBtn("Save"), cancelBtn("Cancel");
-  connect(&saveBtn, &QPushButton::clicked, this, [&]() {
-    QString site = siteInput.text();
-    QString username = usernameInput.text();
-    QString password = passwordInput.text();
-
-    if (!site.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
-      PasswordStorage::instance().addPasswordEntry(site, username, password);
-      dialog.accept();
-    }
-  });
-
-  connect(&cancelBtn, &QPushButton::clicked, &dialog, &QDialog::reject);
-
-  layout.addWidget(new QLabel("Site/Service:"));
-  layout.addWidget(&siteInput);
-  layout.addWidget(new QLabel("Username:"));
-  layout.addWidget(&usernameInput);
-  layout.addWidget(new QLabel("Password:"));
-  layout.addWidget(&passwordInput);
-  layout.addWidget(&saveBtn);
-  layout.addWidget(&cancelBtn);
-
-  dialog.exec();
+  AddPasswordDialog dialog(this);
+  if (dialog.exec() == QDialog::Accepted) {
+    PasswordEntry entry = dialog.getPasswordEntry();
+    PasswordStorage::instance().addPasswordEntry(entry);
+  }
 }

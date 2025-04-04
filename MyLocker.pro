@@ -48,7 +48,10 @@ INCLUDEPATH += /usr/include
 LIBS += -L/usr/lib
 
 SOURCES += \
+    categories/categorymanager.cpp \
     login/autolockmanager.cpp \
+    password/addpassworddialog.cpp \
+    password/passwordcard.cpp \
     settings/settingsmanager.cpp \
     dashboard/dashboard.cpp \
     encryptor/encryptor.cpp \
@@ -63,7 +66,10 @@ SOURCES += \
     setup/setupdialog.cpp
 
 HEADERS += \
+    categories/categorymanager.h \
     login/autolockmanager.h \
+    password/addpassworddialog.h \
+    password/passwordcard.h \
     settings/settingsmanager.h \
     config.h \
     dashboard/dashboard.h \

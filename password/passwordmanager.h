@@ -3,6 +3,7 @@
 
 #include "passwordworker.h"
 
+#include <QComboBox>
 #include <QFrame>
 #include <QUuid>
 #include <QWidget>
@@ -31,7 +32,6 @@ private slots:
 
 private:
   Ui::PasswordManager *ui;
-  QFrame *createPasswordCard(const PasswordEntry &entry);
   void addPasswordCardToUi(const PasswordEntry &entry);
   void confirmAndDeletePassword(QUuid id);
 };

@@ -8,17 +8,11 @@
 
 PasswordWorker::PasswordWorker(QObject *parent) : QObject(parent) {}
 
-void PasswordWorker::addEntry(const QString &title, const QString &username,
-                              const QString &password) {
+void PasswordWorker::addEntry(const PasswordEntry &entry) {
   QWriteLocker locker(&m_lock);
 
   auto entries = loadInternal();
 
-  PasswordEntry entry;
-  entry.title = title;
-  entry.username = username;
-  entry.password = password;
-  entry.timestamp = QDateTime::currentDateTime();
   entries.append(entry);
 
   if (!saveInternal(entries)) {
@@ -48,6 +42,39 @@ void PasswordWorker::deleteEntry(QUuid id) {
   } else {
     emit deletionFailed("Save failed after deletion");
   }
+}
+
+void PasswordWorker::updateEntry(const PasswordEntry &updatedEntry) {
+  QWriteLocker locker(&m_lock);
+
+  auto entries = loadInternal();
+
+  bool found = false;
+  for (auto &entry : entries) {
+    if (entry.id == updatedEntry.id) {
+      entry.title = updatedEntry.title;
+      entry.username = updatedEntry.username;
+      entry.password = updatedEntry.password;
+      entry.timestamp = QDateTime::currentDateTime();
+      entry.url = updatedEntry.url;
+      entry.notes = updatedEntry.notes;
+      entry.category = updatedEntry.category;
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    emit errorOccurred("Entry not found for update");
+    return;
+  }
+
+  if (!saveInternal(entries)) {
+    emit errorOccurred("Failed to save updated entry");
+    return;
+  }
+
+  emit passwordUpdated(updatedEntry);
 }
 
 void PasswordWorker::loadEntries() {
@@ -89,7 +116,7 @@ QVector<PasswordEntry> PasswordWorker::loadInternal() {
 
     // extended fields for version 1+
     if (version >= 1) {
-      in >> entry.url >> entry.notes >> entry.category >> entry.flags;
+      in >> entry.url >> entry.notes >> entry.category;
     }
 
     entry.password = Encryptor::decrypt(encrypted, Config::ENCRYPTION_KEY,
@@ -127,7 +154,7 @@ bool PasswordWorker::saveInternal(const QVector<PasswordEntry> &entries) {
     out << entry.id << entry.title << entry.username << encrypted
         << entry.timestamp;
 
-    out << entry.url << entry.notes << entry.category << entry.flags;
+    out << entry.url << entry.notes << entry.category;
   }
 
   if (!file.commit()) {
