@@ -9,7 +9,7 @@ CategoryManager &CategoryManager::instance() {
 
 CategoryManager::CategoryManager() { loadCategories(); }
 
-#include <algorithm> // for std::sort
+#include <algorithm>
 
 void CategoryManager::loadCategories() {
   categories = presetCategories;

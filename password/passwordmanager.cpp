@@ -32,6 +32,8 @@ PasswordManager::PasswordManager(QWidget *parent)
           &PasswordManager::passwordAdded);
   connect(&PasswordStorage::instance(), &PasswordStorage::passwordDeleted, this,
           &PasswordManager::handlePasswordDeleted);
+  connect(&PasswordStorage::instance(), &PasswordStorage::passwordUpdated, this,
+          &PasswordManager::handlePasswordUpdated);
 
   connect(ui->backToDashboardButton, &QPushButton::clicked, this,
           &PasswordManager::goToDashboard);
@@ -45,6 +47,10 @@ void PasswordManager::addPasswordCardToUi(const PasswordEntry &entry) {
   PasswordCard *card = new PasswordCard(entry, this);
   connect(card, &PasswordCard::deleteRequested, this,
           &PasswordManager::confirmAndDeletePassword);
+  connect(card, &PasswordCard::entryEdited, this,
+          [=](const PasswordEntry &entry) {
+            PasswordStorage::instance().updatePasswordEntry(entry);
+          });
 
   card->setProperty("entryId", entry.id);
   card->setObjectName("card_" + entry.id.toString());
@@ -92,6 +98,21 @@ void PasswordManager::handlePasswordDeleted(QUuid id) {
     }
   }
   updateStackWidget();
+}
+
+void PasswordManager::handlePasswordUpdated(const PasswordEntry &updatedEntry) {
+  QLayout *layout = ui->passwordsContainer->layout();
+  for (int i = 0; i < layout->count(); ++i) {
+    QWidget *widget = layout->itemAt(i)->widget();
+    if (widget && widget->property("entryId").toUuid() == updatedEntry.id) {
+      auto *card = qobject_cast<PasswordCard *>(widget);
+      if (card) {
+        card->setEntry(updatedEntry); // update card data
+        card->refresh();              // refresh UI (you'll implement this)
+      }
+      break;
+    }
+  }
 }
 
 void PasswordManager::passwordError(const QString &error) {

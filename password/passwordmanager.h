@@ -28,6 +28,8 @@ private slots:
   void passwordAdded(PasswordEntry entry);
   void handlePasswordDeleted(QUuid id);
   void passwordError(const QString &error);
+  void handlePasswordUpdated(const PasswordEntry &updatedEntry);
+
   void updateStackWidget();
 
 private:

@@ -36,6 +36,9 @@ PasswordStorage::PasswordStorage() {
   connect(m_worker, &PasswordWorker::passwordAdded, this,
           &PasswordStorage::passwordAdded, Qt::QueuedConnection);
 
+  connect(m_worker, &PasswordWorker::passwordUpdated, this,
+          &PasswordStorage::passwordUpdated, Qt::QueuedConnection);
+
   m_workerThread->start();
 }
 
@@ -54,6 +57,11 @@ void PasswordStorage::addPasswordEntry(const PasswordEntry &entry) {
 void PasswordStorage::deletePasswordEntry(QUuid id) {
   QMetaObject::invokeMethod(m_worker, "deleteEntry", Qt::QueuedConnection,
                             Q_ARG(QUuid, id));
+}
+
+void PasswordStorage::updatePasswordEntry(const PasswordEntry &entry) {
+  QMetaObject::invokeMethod(m_worker, "updateEntry", Qt::QueuedConnection,
+                            Q_ARG(PasswordEntry, entry));
 }
 
 void PasswordStorage::loadPasswords() {

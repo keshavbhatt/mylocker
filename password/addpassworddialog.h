@@ -16,7 +16,10 @@ class AddPasswordDialog : public QDialog {
 
 public:
   explicit AddPasswordDialog(QWidget *parent = nullptr);
-  PasswordEntry getPasswordEntry() const;
+  explicit AddPasswordDialog(const PasswordEntry &entry,
+                             QWidget *parent = nullptr);
+
+  PasswordEntry getPasswordEntry(const QUuid &existingId = NULL) const;
 
 private:
   QLineEdit *siteInput;

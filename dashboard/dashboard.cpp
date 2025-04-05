@@ -23,6 +23,7 @@ void Dashboard::setAutoLockManager(AutoLockManager *manager) {
 }
 
 void Dashboard::updateAutoLockLabel(int seconds) {
-  ui->autoLockTimeoutLabel->setText(
-      QString("Auto-lock in %1 sec").arg(seconds));
+  ui->autoLockTimeoutLabel->setText(QString("Auto-lock in %1 %2")
+                                        .arg(seconds)
+                                        .arg(seconds > 1 ? "secs" : "sec"));
 }

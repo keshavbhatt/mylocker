@@ -15,6 +15,8 @@ public:
   void setStorageFile(const QString &filePath);
   QString getStorageFile() const;
 
+  QString getPasswordStorageFilePath() const;
+
 private:
   SettingsManager();
   ~SettingsManager();

@@ -71,7 +71,6 @@ HEADERS += \
     password/addpassworddialog.h \
     password/passwordcard.h \
     settings/settingsmanager.h \
-    config.h \
     dashboard/dashboard.h \
     encryptor/encryptor.h \
     login/loginscreen.h \

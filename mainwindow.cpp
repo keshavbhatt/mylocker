@@ -3,6 +3,8 @@
 
 #include <QMessageBox>
 
+#include <security-manager/securitymanager.h>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), passwordManager(nullptr) {
 
@@ -80,6 +82,7 @@ void MainWindow::checkForLogout() {
 }
 
 void MainWindow::lockApplication() {
+  SecurityManager::clearSessionKey();
   ui->stackedWidget->setCurrentWidget(loginScreen);
   autoLockManager->reset();
 }

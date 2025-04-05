@@ -1,10 +1,17 @@
 #include "passwordworker.h"
-#include "config.h"
 #include "encryptor/encryptor.h"
 #include <QDataStream>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QSaveFile>
+#include <QStandardPaths>
+#include <security-manager/securitymanager.h>
+#include <settings/settingsmanager.h>
+
+// NOTE:Do not remove, update when format change
+// version handling for backward compatibility
+static const quint32 CURRENT_VERSION = 1;
 
 PasswordWorker::PasswordWorker(QObject *parent) : QObject(parent) {}
 
@@ -85,7 +92,13 @@ void PasswordWorker::loadEntries() {
 QVector<PasswordEntry> PasswordWorker::loadInternal() {
   QVector<PasswordEntry> entries;
 
-  QFile file(Config::STORAGE_FILE);
+  QByteArray key, iv;
+  if (!SecurityManager::getSessionKey(key, iv)) {
+    emit errorOccurred("Decryption key not available");
+    return entries;
+  }
+
+  QFile file(SettingsManager::instance().getPasswordStorageFilePath());
   if (!file.open(QIODevice::ReadOnly)) {
     if (file.exists()) {
       emit errorOccurred("Failed to open password file: " + file.errorString());
@@ -102,31 +115,19 @@ QVector<PasswordEntry> PasswordWorker::loadInternal() {
     return entries;
   }
 
-  // version handling for backward compatibility
-  const quint32 CURRENT_VERSION =
-      1; // NOTE:Do not remove, update when format change
-
   while (!in.atEnd()) {
-    PasswordEntry entry;
     QByteArray encrypted;
+    in >> encrypted;
 
-    // base fields
-    in >> entry.id >> entry.title >> entry.username >> encrypted >>
-        entry.timestamp;
+    QByteArray decryptedBytes = Encryptor::decrypt(encrypted, key, iv);
+    QDataStream entryIn(&decryptedBytes, QIODevice::ReadOnly);
 
-    // extended fields for version 1+
-    if (version >= 1) {
-      in >> entry.url >> entry.notes >> entry.category;
-    }
+    PasswordEntry entry;
+    entryIn >> entry.id >> entry.title >> entry.username >> entry.password >>
+        entry.timestamp >> entry.url >> entry.notes >> entry.category;
 
-    entry.password = Encryptor::decrypt(encrypted, Config::ENCRYPTION_KEY,
-                                        Config::ENCRYPTION_IV);
-
-    // minimal required fields
     if (!entry.id.isNull() && !entry.title.isEmpty()) {
       entries.append(entry);
-    } else {
-      qWarning() << "Skipping invalid entry with empty title or null ID";
     }
   }
 
@@ -134,7 +135,16 @@ QVector<PasswordEntry> PasswordWorker::loadInternal() {
 }
 
 bool PasswordWorker::saveInternal(const QVector<PasswordEntry> &entries) {
-  QSaveFile file(Config::STORAGE_FILE);
+
+  QByteArray key, iv;
+  if (!SecurityManager::getSessionKey(key, iv)) {
+    emit errorOccurred("Encryption key not available");
+    return false;
+  }
+
+  auto passwordStorageFilePath =
+      SettingsManager::instance().getPasswordStorageFilePath();
+  QSaveFile file(passwordStorageFilePath);
   if (!file.open(QIODevice::WriteOnly)) {
     emit errorOccurred("Failed to open file for writing: " +
                        file.errorString());
@@ -147,14 +157,13 @@ bool PasswordWorker::saveInternal(const QVector<PasswordEntry> &entries) {
   out << quint32(0x50A550A5) << quint32(1); // magic + version 1
 
   for (const PasswordEntry &entry : entries) {
+    QByteArray serialized;
+    QDataStream entryOut(&serialized, QIODevice::WriteOnly);
+    entryOut << entry.id << entry.title << entry.username << entry.password
+             << entry.timestamp << entry.url << entry.notes << entry.category;
 
-    QByteArray encrypted = Encryptor::encrypt(
-        entry.password.toUtf8(), Config::ENCRYPTION_KEY, Config::ENCRYPTION_IV);
-
-    out << entry.id << entry.title << entry.username << encrypted
-        << entry.timestamp;
-
-    out << entry.url << entry.notes << entry.category;
+    QByteArray encrypted = Encryptor::encrypt(serialized, key, iv);
+    out << encrypted;
   }
 
   if (!file.commit()) {

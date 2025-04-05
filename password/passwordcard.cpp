@@ -1,5 +1,7 @@
 #include "passwordcard.h"
 
+#include "addpassworddialog.h"
+
 #include <QApplication>
 #include <QClipboard>
 #include <QDialog>
@@ -16,56 +18,137 @@ PasswordCard::PasswordCard(const PasswordEntry &entry, QWidget *parent)
   setupUI();
 }
 
+void PasswordCard::setEntry(const PasswordEntry &entry) { m_entry = entry; }
+
+void PasswordCard::refresh() {
+  m_titleLabel->setText("<b>" + m_entry.title + "</b>");
+  m_userLabel->setText("Username: " + m_entry.username);
+  m_passwordLabel->setText("••••••••");
+  m_togglePassBtn->setText("Show Password");
+}
+
 void PasswordCard::setupUI() {
   auto *cardLayout = new QVBoxLayout(this);
 
-  QLabel *titleLabel = new QLabel("<b>" + m_entry.title + "</b>", this);
-  QLabel *userLabel = new QLabel("Username: " + m_entry.username, this);
+  m_titleLabel = new QLabel("<b>" + m_entry.title + "</b>", this);
+  m_userLabel = new QLabel("Username: " + m_entry.username, this);
   m_passwordLabel = new QLabel("••••••••", this);
 
-  QPushButton *togglePassBtn = new QPushButton("Show", this);
-  connect(togglePassBtn, &QPushButton::clicked, this, [=]() {
+  m_togglePassBtn = new QToolButton(this);
+  m_togglePassBtn->setText("Show Password");
+  connect(m_togglePassBtn, &QToolButton::clicked, this, [=]() {
     bool isHidden = m_passwordLabel->text() == "••••••••";
     m_passwordLabel->setText(isHidden ? m_entry.password : "••••••••");
-    togglePassBtn->setText(isHidden ? "Hide" : "Show");
+    m_togglePassBtn->setText(isHidden ? "Hide Password" : "Show Password");
   });
+  m_togglePassBtn->setPopupMode(QToolButton::MenuButtonPopup);
+  m_togglePassBtn->setToolTip("Show/Hide Password");
+  QMenu *togglePassBtnMenu = new QMenu(m_togglePassBtn);
+  togglePassBtnMenu->addAction("Show Full Entry", this,
+                               [this]() { showFullDetailsDialog(); });
+  m_togglePassBtn->setMenu(togglePassBtnMenu);
 
-  QPushButton *copyPasswordBtn = new QPushButton("Copy Password", this);
-  connect(copyPasswordBtn, &QPushButton::clicked, this,
-          [=]() { QApplication::clipboard()->setText(m_entry.password); });
+  QToolButton *copyPasswordBtn = createCopyToolButton();
 
-  QToolButton *menuButton = new QToolButton(this);
-  menuButton->setText("Detail");
-  menuButton->setPopupMode(QToolButton::MenuButtonPopup);
-  menuButton->setToolTip("Open in Detailed View");
+  QToolButton *editToolButton = new QToolButton(this);
+  editToolButton->setText("Edit Entry");
+  editToolButton->setToolTip("Edit this Entry");
+  editToolButton->setPopupMode(QToolButton::MenuButtonPopup);
 
-  connect(menuButton, &QToolButton::clicked, this,
-          [this]() { showFullDetailsDialog(); });
+  connect(editToolButton, &QToolButton::clicked, this,
+          [this]() { showEditDialog(); });
 
-  QMenu *menu = new QMenu(menuButton);
-  menu->addAction("Copy Password", this, [this]() {
-    QApplication::clipboard()->setText(m_entry.password);
-  });
-
-  menu->addAction("Delete", this,
-                  [this]() { emit deleteRequested(m_entry.id); });
-
-  menuButton->setMenu(menu);
+  QMenu *editToolButtonMenu = new QMenu(editToolButton);
+  editToolButtonMenu->addAction("Delete Entry", this,
+                                [this]() { emit deleteRequested(m_entry.id); });
+  editToolButtonMenu->addAction("Duplicate Entry", this,
+                                [this]() { emit duplicateRequested(m_entry); });
+  editToolButton->setMenu(editToolButtonMenu);
 
   auto *buttonLayout = new QHBoxLayout();
-  buttonLayout->addWidget(togglePassBtn);
+  buttonLayout->addWidget(m_togglePassBtn);
   buttonLayout->addWidget(copyPasswordBtn);
   buttonLayout->addStretch();
-  buttonLayout->addWidget(menuButton);
+  buttonLayout->addWidget(editToolButton);
 
-  cardLayout->addWidget(titleLabel);
-  cardLayout->addWidget(userLabel);
+  cardLayout->addWidget(m_titleLabel);
+  cardLayout->addWidget(m_userLabel);
   cardLayout->addWidget(m_passwordLabel);
   cardLayout->addLayout(buttonLayout);
 
   setLayout(cardLayout);
   setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
   setLineWidth(2);
+}
+
+QToolButton *PasswordCard::createCopyToolButton() {
+  QToolButton *button = new QToolButton(this);
+  button->setPopupMode(QToolButton::MenuButtonPopup);
+  button->setText("Copy Password");
+  button->setToolTip("Copy Password to Clipboard");
+
+  // Default button click copies password
+  QObject::connect(button, &QToolButton::clicked, button, [=]() {
+    QApplication::clipboard()->setText(m_entry.password);
+  });
+
+  // Build the menu
+  QMenu *menu = new QMenu(button);
+
+  if (!m_entry.title.isEmpty()) {
+    QAction *copyTitle = menu->addAction("Copy Title");
+    QObject::connect(copyTitle, &QAction::triggered, button, [=]() {
+      QApplication::clipboard()->setText(m_entry.title);
+    });
+  }
+
+  if (!m_entry.username.isEmpty()) {
+    QAction *copyUsername = menu->addAction("Copy Username");
+    QObject::connect(copyUsername, &QAction::triggered, button, [=]() {
+      QApplication::clipboard()->setText(m_entry.username);
+    });
+  }
+
+  if (!m_entry.password.isEmpty()) {
+    QAction *copyPassword = menu->addAction("Copy Password");
+    QObject::connect(copyPassword, &QAction::triggered, button, [=]() {
+      QApplication::clipboard()->setText(m_entry.password);
+    });
+  }
+
+  if (!m_entry.url.isEmpty()) {
+    QAction *copyURL = menu->addAction("Copy URL");
+    QObject::connect(copyURL, &QAction::triggered, button, [=]() {
+      QApplication::clipboard()->setText(m_entry.url);
+    });
+  }
+
+  if (!m_entry.notes.isEmpty()) {
+    QAction *copyNotes = menu->addAction("Copy Notes");
+    QObject::connect(copyNotes, &QAction::triggered, button, [=]() {
+      QApplication::clipboard()->setText(m_entry.notes);
+    });
+  }
+
+  if (!m_entry.category.isEmpty()) {
+    QAction *copyCategory = menu->addAction("Copy Category");
+    QObject::connect(copyCategory, &QAction::triggered, button, [=]() {
+      QApplication::clipboard()->setText(m_entry.category);
+    });
+  }
+
+  button->setMenu(menu);
+  return button;
+}
+
+void PasswordCard::showEditDialog() {
+  AddPasswordDialog dialog(m_entry, this);
+  if (dialog.exec() == QDialog::Accepted) {
+    PasswordEntry updated = dialog.getPasswordEntry(m_entry.id);
+    updated.timestamp = QDateTime::currentDateTime();
+
+    emit entryEdited(updated);
+  }
 }
 
 void PasswordCard::showFullDetailsDialog() {

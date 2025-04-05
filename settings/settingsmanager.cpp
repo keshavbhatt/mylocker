@@ -1,5 +1,7 @@
 #include "settingsmanager.h"
 #include <QCoreApplication>
+#include <QDir>
+#include <QStandardPaths>
 
 SettingsManager::SettingsManager() {
   // Default to application settings path
@@ -37,4 +39,20 @@ void SettingsManager::setStorageFile(const QString &filePath) {
 QString SettingsManager::getStorageFile() const {
   QMutexLocker locker(&mutex);
   return storageFile;
+}
+
+QString SettingsManager::getPasswordStorageFilePath() const {
+  const QString baseDirPath = instance()
+                                  .getValue("paths/passwordmanager-file-path",
+                                            QStandardPaths::writableLocation(
+                                                QStandardPaths::DataLocation))
+                                  .toString();
+
+  QDir dir;
+  if (!dir.exists(baseDirPath)) {
+    dir.mkpath(baseDirPath);
+  }
+
+  QString fullPath = baseDirPath + QDir::separator() + "passwords.dat";
+  return fullPath;
 }

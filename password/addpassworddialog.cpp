@@ -4,6 +4,21 @@
 
 #include <categories/categorymanager.h>
 
+AddPasswordDialog::AddPasswordDialog(const PasswordEntry &entry,
+                                     QWidget *parent)
+    : AddPasswordDialog(parent) {
+  siteInput->setText(entry.title);
+  usernameInput->setText(entry.username);
+  passwordInput->setText(entry.password);
+  categoryCombo->setCurrentText(entry.category);
+
+  if (!entry.url.isEmpty() || !entry.notes.isEmpty()) {
+    extendedGroup->setChecked(true);
+    urlInput->setText(entry.url);
+    notesInput->setText(entry.notes);
+  }
+}
+
 AddPasswordDialog::AddPasswordDialog(QWidget *parent)
     : QDialog(parent), siteInput(new QLineEdit(this)),
       usernameInput(new QLineEdit(this)), passwordInput(new QLineEdit(this)),
@@ -75,8 +90,10 @@ AddPasswordDialog::AddPasswordDialog(QWidget *parent)
   connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-PasswordEntry AddPasswordDialog::getPasswordEntry() const {
+PasswordEntry
+AddPasswordDialog::getPasswordEntry(const QUuid &existingId) const {
   PasswordEntry entry;
+  entry.id = existingId.isNull() ? QUuid::createUuid() : existingId;
   entry.title = siteInput->text();
   entry.username = usernameInput->text();
   entry.password = passwordInput->text();
