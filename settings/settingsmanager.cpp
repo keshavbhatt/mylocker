@@ -49,7 +49,7 @@ int SettingsManager::getClipboardClearDelay() const {
 
 QString SettingsManager::getPasswordStorageFilePath() const {
   const QString baseDirPath = instance()
-                                  .getValue("paths/passwordmanager-file-path",
+                                  .getValue("paths/password-manager-base-dir",
                                             QStandardPaths::writableLocation(
                                                 QStandardPaths::DataLocation))
                                   .toString();
