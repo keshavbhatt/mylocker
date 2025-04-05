@@ -75,11 +75,10 @@ bool Encryptor::deriveKeyAndIV(const QString &password, const QByteArray &salt,
   const int ivLength = 16;  // AES block size
   QByteArray keyiv(keyLength + ivLength, Qt::Uninitialized);
 
-  if (!PKCS5_PBKDF2_HMAC_SHA1(
-          password.toUtf8().data(), password.size(),
-          reinterpret_cast<const unsigned char *>(salt.data()), salt.size(),
-          iterations, keyiv.size(),
-          reinterpret_cast<unsigned char *>(keyiv.data()))) {
+  if (!PKCS5_PBKDF2_HMAC(password.toUtf8().data(), password.size(),
+                         reinterpret_cast<const unsigned char *>(salt.data()),
+                         salt.size(), iterations, EVP_sha256(), keyiv.size(),
+                         reinterpret_cast<unsigned char *>(keyiv.data()))) {
     return false;
   }
 
