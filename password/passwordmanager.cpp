@@ -39,6 +39,8 @@ PasswordManager::PasswordManager(QWidget *parent)
           &PasswordManager::goToDashboard);
   connect(ui->addPasswordButton, &QPushButton::clicked, this,
           &PasswordManager::addPasswordClicked);
+  connect(ui->filterEntriesInput, &QLineEdit::textChanged, this,
+          [this](const QString &text) { filterEntries(text); });
 
   PasswordStorage::instance().loadPasswords();
 }
@@ -47,6 +49,10 @@ void PasswordManager::addPasswordCardToUi(const PasswordEntry &entry) {
   PasswordCard *card = new PasswordCard(entry, this);
   connect(card, &PasswordCard::deleteRequested, this,
           &PasswordManager::confirmAndDeletePassword);
+  connect(card, &PasswordCard::entryDuplicated, this,
+          [=](const PasswordEntry &newEntry) {
+            PasswordStorage::instance().addPasswordEntry(newEntry);
+          });
   connect(card, &PasswordCard::entryEdited, this,
           [=](const PasswordEntry &entry) {
             PasswordStorage::instance().updatePasswordEntry(entry);
@@ -132,5 +138,22 @@ void PasswordManager::addPasswordClicked() {
   if (dialog.exec() == QDialog::Accepted) {
     PasswordEntry entry = dialog.getPasswordEntry();
     PasswordStorage::instance().addPasswordEntry(entry);
+  }
+}
+
+void PasswordManager::filterEntries(const QString &filterText) {
+  QLayout *layout = ui->passwordsContainer->layout();
+  for (int i = 0; i < layout->count(); ++i) {
+    QWidget *widget = layout->itemAt(i)->widget();
+    if (auto card = qobject_cast<PasswordCard *>(widget)) {
+      const auto &entry = card->entry();
+      bool matches = entry.title.contains(filterText, Qt::CaseInsensitive) ||
+                     entry.username.contains(filterText, Qt::CaseInsensitive) ||
+                     entry.url.contains(filterText, Qt::CaseInsensitive) ||
+                     entry.notes.contains(filterText, Qt::CaseInsensitive) ||
+                     entry.category.contains(filterText, Qt::CaseInsensitive);
+
+      card->setVisible(matches);
+    }
   }
 }

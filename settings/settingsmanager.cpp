@@ -41,6 +41,12 @@ QString SettingsManager::getStorageFile() const {
   return storageFile;
 }
 
+int SettingsManager::getClipboardClearDelay() const {
+  return instance()
+      .getValue("clipboard/clearDelay", 30000)
+      .toInt(); // default 30 sec , 0 mean no autoclear
+}
+
 QString SettingsManager::getPasswordStorageFilePath() const {
   const QString baseDirPath = instance()
                                   .getValue("paths/passwordmanager-file-path",

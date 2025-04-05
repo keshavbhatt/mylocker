@@ -29,6 +29,7 @@ private slots:
   void handlePasswordDeleted(QUuid id);
   void passwordError(const QString &error);
   void handlePasswordUpdated(const PasswordEntry &updatedEntry);
+  void filterEntries(const QString &filterText);
 
   void updateStackWidget();
 

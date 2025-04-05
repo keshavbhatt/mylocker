@@ -10,8 +10,12 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QTimer>
 #include <QToolButton>
+#include <QToolTip>
 #include <QVBoxLayout>
+
+#include <settings/settingsmanager.h>
 
 PasswordCard::PasswordCard(const PasswordEntry &entry, QWidget *parent)
     : QFrame(parent), m_entry(entry) {
@@ -23,7 +27,8 @@ void PasswordCard::setEntry(const PasswordEntry &entry) { m_entry = entry; }
 void PasswordCard::refresh() {
   m_titleLabel->setText("<b>" + m_entry.title + "</b>");
   m_userLabel->setText("Username: " + m_entry.username);
-  m_passwordLabel->setText("••••••••");
+  m_categoryLabel->setText("Category: " + m_entry.category);
+  m_passwordLabel->setText("Password: ••••••••");
   m_togglePassBtn->setText("Show Password");
 }
 
@@ -32,13 +37,15 @@ void PasswordCard::setupUI() {
 
   m_titleLabel = new QLabel("<b>" + m_entry.title + "</b>", this);
   m_userLabel = new QLabel("Username: " + m_entry.username, this);
-  m_passwordLabel = new QLabel("••••••••", this);
+  m_passwordLabel = new QLabel("Password: ••••••••", this);
+  m_categoryLabel = new QLabel("Category: " + m_entry.category, this);
 
   m_togglePassBtn = new QToolButton(this);
   m_togglePassBtn->setText("Show Password");
   connect(m_togglePassBtn, &QToolButton::clicked, this, [=]() {
-    bool isHidden = m_passwordLabel->text() == "••••••••";
-    m_passwordLabel->setText(isHidden ? m_entry.password : "••••••••");
+    bool isHidden = m_passwordLabel->text() == "Password: ••••••••";
+    m_passwordLabel->setText(isHidden ? "Password: " + m_entry.password
+                                      : "Password: ••••••••");
     m_togglePassBtn->setText(isHidden ? "Hide Password" : "Show Password");
   });
   m_togglePassBtn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -56,13 +63,15 @@ void PasswordCard::setupUI() {
   editToolButton->setPopupMode(QToolButton::MenuButtonPopup);
 
   connect(editToolButton, &QToolButton::clicked, this,
-          [this]() { showEditDialog(); });
+          &PasswordCard::showEditDialog);
 
   QMenu *editToolButtonMenu = new QMenu(editToolButton);
+  editToolButtonMenu->addAction("Edit as New Entry", this,
+                                &PasswordCard::showDuplicateDialog);
+  editToolButtonMenu->addSeparator();
   editToolButtonMenu->addAction("Delete Entry", this,
                                 [this]() { emit deleteRequested(m_entry.id); });
-  editToolButtonMenu->addAction("Duplicate Entry", this,
-                                [this]() { emit duplicateRequested(m_entry); });
+
   editToolButton->setMenu(editToolButtonMenu);
 
   auto *buttonLayout = new QHBoxLayout();
@@ -74,11 +83,39 @@ void PasswordCard::setupUI() {
   cardLayout->addWidget(m_titleLabel);
   cardLayout->addWidget(m_userLabel);
   cardLayout->addWidget(m_passwordLabel);
+  cardLayout->addWidget(m_categoryLabel);
   cardLayout->addLayout(buttonLayout);
 
   setLayout(cardLayout);
   setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
   setLineWidth(2);
+}
+
+PasswordEntry PasswordCard::entry() const { return m_entry; }
+
+void PasswordCard::copyToClipboardSecurely(const QString &text) {
+  QApplication::clipboard()->setText(text);
+
+  int clearDelayMs = SettingsManager::instance().getClipboardClearDelay();
+
+  QTimer::singleShot(150, this, [clearDelayMs]() {
+    QString message =
+        (clearDelayMs != 0)
+            ? "Copied to clipboard (auto-clears in a few seconds)."
+              "\nIf you use a clipboard manager, consider clearing it manually "
+              "for better security."
+            : "Copied to clipboard.";
+    QToolTip::showText(QCursor::pos(), message);
+  });
+
+  if (clearDelayMs != 0) {
+    QTimer::singleShot(clearDelayMs, this, [text]() {
+      QClipboard *clipboard = QApplication::clipboard();
+      if (clipboard->text() == text) {
+        clipboard->clear(QClipboard::Clipboard);
+      }
+    });
+  }
 }
 
 QToolButton *PasswordCard::createCopyToolButton() {
@@ -87,54 +124,45 @@ QToolButton *PasswordCard::createCopyToolButton() {
   button->setText("Copy Password");
   button->setToolTip("Copy Password to Clipboard");
 
-  // Default button click copies password
-  QObject::connect(button, &QToolButton::clicked, button, [=]() {
-    QApplication::clipboard()->setText(m_entry.password);
-  });
+  QObject::connect(button, &QToolButton::clicked, button,
+                   [=]() { copyToClipboardSecurely(m_entry.password); });
 
-  // Build the menu
   QMenu *menu = new QMenu(button);
 
   if (!m_entry.title.isEmpty()) {
     QAction *copyTitle = menu->addAction("Copy Title");
-    QObject::connect(copyTitle, &QAction::triggered, button, [=]() {
-      QApplication::clipboard()->setText(m_entry.title);
-    });
+    QObject::connect(copyTitle, &QAction::triggered, button,
+                     [=]() { copyToClipboardSecurely(m_entry.title); });
   }
 
   if (!m_entry.username.isEmpty()) {
     QAction *copyUsername = menu->addAction("Copy Username");
-    QObject::connect(copyUsername, &QAction::triggered, button, [=]() {
-      QApplication::clipboard()->setText(m_entry.username);
-    });
+    QObject::connect(copyUsername, &QAction::triggered, button,
+                     [=]() { copyToClipboardSecurely(m_entry.username); });
   }
 
   if (!m_entry.password.isEmpty()) {
     QAction *copyPassword = menu->addAction("Copy Password");
-    QObject::connect(copyPassword, &QAction::triggered, button, [=]() {
-      QApplication::clipboard()->setText(m_entry.password);
-    });
+    QObject::connect(copyPassword, &QAction::triggered, button,
+                     [=]() { copyToClipboardSecurely(m_entry.password); });
   }
 
   if (!m_entry.url.isEmpty()) {
     QAction *copyURL = menu->addAction("Copy URL");
-    QObject::connect(copyURL, &QAction::triggered, button, [=]() {
-      QApplication::clipboard()->setText(m_entry.url);
-    });
+    QObject::connect(copyURL, &QAction::triggered, button,
+                     [=]() { copyToClipboardSecurely(m_entry.url); });
   }
 
   if (!m_entry.notes.isEmpty()) {
     QAction *copyNotes = menu->addAction("Copy Notes");
-    QObject::connect(copyNotes, &QAction::triggered, button, [=]() {
-      QApplication::clipboard()->setText(m_entry.notes);
-    });
+    QObject::connect(copyNotes, &QAction::triggered, button,
+                     [=]() { copyToClipboardSecurely(m_entry.notes); });
   }
 
   if (!m_entry.category.isEmpty()) {
     QAction *copyCategory = menu->addAction("Copy Category");
-    QObject::connect(copyCategory, &QAction::triggered, button, [=]() {
-      QApplication::clipboard()->setText(m_entry.category);
-    });
+    QObject::connect(copyCategory, &QAction::triggered, button,
+                     [=]() { copyToClipboardSecurely(m_entry.category); });
   }
 
   button->setMenu(menu);
@@ -143,11 +171,23 @@ QToolButton *PasswordCard::createCopyToolButton() {
 
 void PasswordCard::showEditDialog() {
   AddPasswordDialog dialog(m_entry, this);
+  dialog.setWindowTitle("Edit Entry");
   if (dialog.exec() == QDialog::Accepted) {
     PasswordEntry updated = dialog.getPasswordEntry(m_entry.id);
     updated.timestamp = QDateTime::currentDateTime();
 
     emit entryEdited(updated);
+  }
+}
+
+void PasswordCard::showDuplicateDialog() {
+  AddPasswordDialog dialog(m_entry, this);
+  dialog.setWindowTitle("Edit as New Entry");
+  if (dialog.exec() == QDialog::Accepted) {
+    PasswordEntry updated = dialog.getPasswordEntry();
+    updated.timestamp = QDateTime::currentDateTime();
+
+    emit entryDuplicated(updated);
   }
 }
 
