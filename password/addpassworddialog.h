@@ -32,6 +32,7 @@ private:
 
   QPushButton *saveBtn;
   QPushButton *cancelBtn;
+  QToolButton *createPasswordGeneratorButton(QLineEdit *targetInput, QWidget *parent);
 };
 
 #endif // ADDPASSWORDDIALOG_H

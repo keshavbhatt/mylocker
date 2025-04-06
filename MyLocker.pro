@@ -52,6 +52,8 @@ SOURCES += \
     login/autolockmanager.cpp \
     password/addpassworddialog.cpp \
     password/passwordcard.cpp \
+    password/passwordgenerator.cpp \
+    password/passwordgeneratordialog.cpp \
     settings/settingsmanager.cpp \
     dashboard/dashboard.cpp \
     encryptor/encryptor.cpp \
@@ -70,6 +72,8 @@ HEADERS += \
     login/autolockmanager.h \
     password/addpassworddialog.h \
     password/passwordcard.h \
+    password/passwordgenerator.h \
+    password/passwordgeneratordialog.h \
     settings/settingsmanager.h \
     dashboard/dashboard.h \
     encryptor/encryptor.h \

@@ -40,6 +40,7 @@ private:
   PasswordManager *passwordManager = nullptr;
   Dashboard *dashboard = nullptr;
   NotesManager *notesManager = nullptr;
+  void closeAllSecondaryWindows();
 };
 
 #endif // MAINWINDOW_H

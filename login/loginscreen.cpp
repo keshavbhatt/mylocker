@@ -8,6 +8,7 @@
 LoginScreen::LoginScreen(QWidget *parent)
     : QWidget(parent), ui(new Ui::LoginScreen) {
   ui->setupUi(this);
+  setProperty("isLoginScreen", true);
   resetUi();
 
   connect(ui->passwordInput, &QLineEdit::returnPressed, this,

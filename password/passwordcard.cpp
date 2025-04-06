@@ -193,6 +193,7 @@ void PasswordCard::showDuplicateDialog() {
 
 void PasswordCard::showFullDetailsDialog() {
   QDialog *dialog = new QDialog(this);
+  dialog->setModal(true);
   dialog->setWindowTitle("Password Details");
   dialog->resize(400, 300);
 

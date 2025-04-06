@@ -82,9 +82,23 @@ void MainWindow::checkForLogout() {
 }
 
 void MainWindow::lockApplication() {
+  closeAllSecondaryWindows();
   SecurityManager::clearSessionKey();
   ui->stackedWidget->setCurrentWidget(loginScreen);
   autoLockManager->reset();
+}
+
+void MainWindow::closeAllSecondaryWindows() {
+  const auto topLevels = QApplication::topLevelWidgets();
+  for (QWidget *w : topLevels) {
+    if (w->isVisible() && !w->property("isLoginScreen").toBool()) {
+      if (qobject_cast<QDialog *>(w) || qobject_cast<QMenu *>(w)) {
+        w->close(); // Close dialogs and menus
+      } else if (w != this) {
+        w->hide(); // Hide any extra windows
+      }
+    }
+  }
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
