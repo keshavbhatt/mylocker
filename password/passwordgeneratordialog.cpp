@@ -53,10 +53,8 @@ PasswordGeneratorDialog::PasswordGeneratorDialog(QWidget *parent)
   mainLayout->addWidget(passwordEdit);
 
   // Strength
-  strengthLabel = new QLabel("Strength: ", this);
   strengthProgress = new QProgressBar(this);
   strengthProgress->setRange(0, 100);
-  mainLayout->addWidget(strengthLabel);
   mainLayout->addWidget(strengthProgress);
 
   // Buttons
@@ -111,9 +109,10 @@ void PasswordGeneratorDialog::updatePassword() {
   passwordEdit->setText(m_generatedPassword);
 
   int strength = PasswordGenerator::calculateStrength(m_generatedPassword);
+  QString strengthDesc = PasswordGenerator::strengthDescription(strength);
   strengthProgress->setValue(strength);
-  strengthLabel->setText("Strength: " +
-                         PasswordGenerator::strengthDescription(strength));
+  strengthProgress->setFormat(strengthDesc);
+  strengthProgress->setTextVisible(true);
 }
 
 void PasswordGeneratorDialog::copyToClipboard() {

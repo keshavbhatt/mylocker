@@ -31,7 +31,6 @@ private:
   QCheckBox *extendedCheck;
 
   QLineEdit *passwordEdit;
-  QLabel *strengthLabel;
   QProgressBar *strengthProgress;
 
   QPushButton *copyButton;
