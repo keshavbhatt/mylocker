@@ -1,6 +1,8 @@
 #include "notesmanager.h"
 #include "ui_notesmanager.h"
 
+#include <QDebug>
+
 NotesManager::NotesManager(QWidget *parent)
     : QWidget(parent), ui(new Ui::NotesManager) {
   ui->setupUi(this);
@@ -9,4 +11,7 @@ NotesManager::NotesManager(QWidget *parent)
           &NotesManager::goToDashboard);
 }
 
-NotesManager::~NotesManager() { delete ui; }
+NotesManager::~NotesManager() {
+  qDebug() << "Deleted NotesManager";
+  delete ui;
+}

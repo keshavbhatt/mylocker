@@ -13,6 +13,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <password/storage/passwordstorage.h>
+#include <vault/vaultmanager.h>
 
 #include <categories/categorymanager.h>
 
@@ -43,6 +44,21 @@ PasswordManager::PasswordManager(QWidget *parent)
           [this](const QString &text) { filterEntries(text); });
 
   PasswordStorage::instance().loadPasswords();
+  // stressTest();
+}
+
+void PasswordManager::stressTest() {
+  QString currentVaultName = VaultManager::instance().currentVault().name();
+  for (int i = 0; i < 500; ++i) {
+    PasswordEntry entry;
+    entry.category = "Other";
+    entry.notes = QString("Note for user %1 password entry.").arg(i);
+    entry.password = "assext";
+    entry.title = QString("google %1 in %2").arg(i).arg(currentVaultName);
+    entry.url = "gmail.com";
+    entry.username = QString("user %1").arg(i);
+    PasswordStorage::instance().addPasswordEntry(entry);
+  }
 }
 
 void PasswordManager::addPasswordCardToUi(const PasswordEntry &entry) {
@@ -131,7 +147,10 @@ void PasswordManager::updateStackWidget() {
                                                  : ui->noPasswordsPage);
 }
 
-PasswordManager::~PasswordManager() { delete ui; }
+PasswordManager::~PasswordManager() {
+  qDebug() << "Deleted PasswordManager";
+  delete ui;
+}
 
 void PasswordManager::addPasswordClicked() {
   AddPasswordDialog dialog(this);

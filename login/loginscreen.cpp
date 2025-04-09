@@ -1,26 +1,43 @@
 #include "loginscreen.h"
 #include "ui_loginscreen.h"
 
+#include <QDebug>
 #include <QMessageBox>
 
 #include <security-manager/securitymanager.h>
 
+#include <vault/vaultmanager.h>
+
+#include <locker/managelocker.h>
+
 LoginScreen::LoginScreen(QWidget *parent)
     : QWidget(parent), ui(new Ui::LoginScreen) {
   ui->setupUi(this);
+
   setProperty("isLoginScreen", true);
+
   resetUi();
 
   connect(ui->passwordInput, &QLineEdit::returnPressed, this,
           &LoginScreen::onUnlockClicked);
   connect(ui->unlockButton, &QPushButton::clicked, this,
           &LoginScreen::onUnlockClicked);
+
+  connect(ui->manageLockerButton, &QPushButton::clicked, this,
+          &LoginScreen::onManageLockerClicked);
+
+  loadVaults();
 }
 
 LoginScreen::~LoginScreen() { delete ui; }
 
+void LoginScreen::logout() {
+  resetUi();
+  loadVaults();
+}
+
 void LoginScreen::onUnlockClicked() {
-  QString password = ui->passwordInput->text().trimmed();
+  const QString password = ui->passwordInput->text().trimmed();
 
   if (password.isEmpty()) {
     showError("Please enter your master password.");
@@ -28,6 +45,15 @@ void LoginScreen::onUnlockClicked() {
   }
 
   if (SecurityManager::validateMasterPassword(password)) {
+    Vault newVault(m_vaultListWidget->selectedVaultName());
+
+    auto lockerDataDirPath = m_settings.value("lockerDataDirPath").toString();
+
+    if (!VaultManager::instance().openVault(newVault, lockerDataDirPath)) {
+      QMessageBox::critical(this, "Error", "Failed to open vault.");
+      return;
+    }
+
     resetUi();
     emit loginSuccessful();
   } else {
@@ -35,14 +61,85 @@ void LoginScreen::onUnlockClicked() {
   }
 }
 
+void LoginScreen::onManageLockerClicked() {
+  const QString password = ui->passwordInput->text().trimmed();
+
+  if (password.isEmpty()) {
+    showError("Please enter your master password.");
+    return;
+  }
+
+  if (SecurityManager::validateMasterPassword(password)) {
+    auto lockerDataDirPath = m_settings.value("lockerDataDirPath").toString();
+    ui->passwordInput->clear();
+    ui->errorLabel->hide();
+    manageLocker(lockerDataDirPath);
+  } else {
+    showError("Invalid password. Try again.");
+  }
+}
+
+void LoginScreen::manageLocker(const QString &lockerDataDirPath) {
+  ManageLocker *manageLocker = new ManageLocker(lockerDataDirPath, this);
+  manageLocker->setWindowTitle(QApplication::applicationName() +
+                               " | Manage Locker");
+  manageLocker->setAttribute(Qt::WA_DeleteOnClose);
+  manageLocker->setWindowModality(Qt::ApplicationModal);
+  manageLocker->setWindowFlags(Qt::Dialog | Qt::WindowTitleHint |
+                               Qt::WindowCloseButtonHint);
+  manageLocker->resize(500, 300);
+
+  connect(manageLocker, &QObject::destroyed, this,
+          [=]() { this->loadVaults(); });
+
+  manageLocker->show();
+}
+
 void LoginScreen::showError(const QString &message) {
   ui->errorLabel->setText(message);
   ui->errorLabel->setStyleSheet("color: red;");
   ui->errorLabel->show();
+  ui->passwordInput->setFocus();
 }
 
 void LoginScreen::resetUi() {
   ui->errorLabel->hide();
+  ui->passwordInput->setEnabled(false);
+  ui->unlockButton->setEnabled(false);
   ui->passwordInput->clear();
-  ui->passwordInput->setFocus();
+  ui->vaultWidget->setVisible(false);
+}
+
+void LoginScreen::vaultSelectionChanged(const QString &selectedVaultName) {
+  if (selectedVaultName.trimmed().isEmpty() == false) {
+    ui->passwordInput->setEnabled(true);
+    ui->unlockButton->setEnabled(true);
+    ui->unlockButton->setVisible(true);
+    ui->unlockButton->setText(QString("UnLock '%1'").arg(selectedVaultName));
+    ui->passwordInput->setFocus();
+  } else {
+    ui->unlockButton->setVisible(false);
+    ui->passwordInput->setEnabled(false);
+    ui->unlockButton->setEnabled(false);
+  }
+}
+
+void LoginScreen::loadVaults() {
+  if (m_vaultListWidget == nullptr) {
+    m_vaultListWidget = new VaultListWidget(this);
+    ui->vaultWidget->layout()->addWidget(m_vaultListWidget);
+    connect(m_vaultListWidget, &VaultListWidget::vaultSelectionChanged, this,
+            &LoginScreen::vaultSelectionChanged);
+  }
+  auto lockerDataDirPath = m_settings.value("lockerDataDirPath").toString();
+
+  m_vaultListWidget->loadFromDirectory(lockerDataDirPath);
+  ui->vaultWidget->setVisible(true);
+
+  // temporary open the vault to allow password varification
+  Vault newVault(m_vaultListWidget->selectedVaultName());
+  if (!VaultManager::instance().openVault(newVault, lockerDataDirPath)) {
+    QMessageBox::critical(this, "Error", "Failed to open vault.");
+    return;
+  }
 }

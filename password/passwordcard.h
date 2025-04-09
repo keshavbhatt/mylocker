@@ -30,7 +30,8 @@ private slots:
 private:
   void setupUI();
 
-  PasswordEntry m_entry;
+  PasswordEntry m_entry; // TODO: do not hold entry just keep the id, and load
+                         // entry on demand to reduce memory usages
   QLabel *m_titleLabel = nullptr;
   QLabel *m_userLabel = nullptr;
   QLabel *m_categoryLabel = nullptr;

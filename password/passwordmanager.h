@@ -37,6 +37,7 @@ private:
   Ui::PasswordManager *ui;
   void addPasswordCardToUi(const PasswordEntry &entry);
   void confirmAndDeletePassword(QUuid id);
+  void stressTest();
 };
 
 #endif // PASSWORDMANAGER_H

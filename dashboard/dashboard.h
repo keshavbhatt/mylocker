@@ -5,6 +5,10 @@
 
 #include <login/autolockmanager.h>
 
+#include <password/passwordmanager.h>
+
+#include <notes/notesmanager.h>
+
 namespace Ui {
 class Dashboard;
 }
@@ -18,15 +22,17 @@ public:
   void setAutoLockManager(class AutoLockManager *manager);
 
 signals:
-  void openPasswordManager();
-  void openSecureNotes();
-  void onLockNowClicked();
+  void lockApplicationRequested();
 
 private:
   Ui::Dashboard *ui;
+  PasswordManager *passwordManager = nullptr;
+  NotesManager *notesManager = nullptr;
 
 private slots:
   void updateAutoLockLabel(int seconds);
+  void showPasswordManager();
+  void showNotesManager();
 };
 
 #endif // DASHBOARD_H

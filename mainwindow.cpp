@@ -1,12 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QDebug>
 #include <QMessageBox>
 
 #include <security-manager/securitymanager.h>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), passwordManager(nullptr) {
+    : QMainWindow(parent), ui(new Ui::MainWindow) {
 
   ui->setupUi(this);
   setWindowTitle(APPLICATION_FULLNAME);
@@ -30,12 +31,8 @@ void MainWindow::showDashboard() {
   if (!dashboard) {
     dashboard = new Dashboard(this);
 
-    connect(dashboard, &Dashboard::onLockNowClicked, this,
+    connect(dashboard, &Dashboard::lockApplicationRequested, this,
             &MainWindow::lockApplication);
-    connect(dashboard, &Dashboard::openPasswordManager, this,
-            &MainWindow::showPasswordManager);
-    connect(dashboard, &Dashboard::openSecureNotes, this,
-            &MainWindow::showNotesManager);
 
     if (autoLockManager)
       dashboard->setAutoLockManager(autoLockManager);
@@ -45,45 +42,35 @@ void MainWindow::showDashboard() {
   ui->stackedWidget->setCurrentWidget(dashboard);
 }
 
-void MainWindow::showPasswordManager() {
-  if (!passwordManager) {
-    passwordManager = new PasswordManager(this);
-    connect(passwordManager, &PasswordManager::goToDashboard, this,
-            &MainWindow::showDashboard);
-
-    ui->stackedWidget->addWidget(passwordManager);
-  }
-  ui->stackedWidget->setCurrentWidget(passwordManager);
-}
-
-void MainWindow::showNotesManager() {
-  if (!notesManager) {
-    notesManager = new NotesManager(this);
-    connect(notesManager, &NotesManager::goToDashboard, this,
-            &MainWindow::showDashboard);
-
-    ui->stackedWidget->addWidget(notesManager);
-  }
-  ui->stackedWidget->setCurrentWidget(notesManager);
-}
-
 void MainWindow::checkForLogout() {
-  bool logoutRequired =
-      SettingsManager::instance().getValue("security/logout_required").toBool();
+
+  QSettings settings;
+  bool logoutRequired = settings.value("security/logout_required").toBool();
 
   if (logoutRequired) {
     QMessageBox::information(
         this, "Security", "Master password has been set. Please log in again.");
     ui->stackedWidget->setCurrentWidget(loginScreen);
-    SettingsManager::instance().setValue("security/logout_required", false);
+    settings.setValue("security/logout_required", false);
   } else {
     ui->stackedWidget->setCurrentWidget(loginScreen);
   }
 }
 
 void MainWindow::lockApplication() {
+
   closeAllSecondaryWindows();
+
+  // delete dashboard
+  if (dashboard) {
+    ui->stackedWidget->removeWidget(dashboard);
+    dashboard->deleteLater();
+    dashboard = nullptr;
+  }
+
   SecurityManager::clearSessionKey();
+
+  loginScreen->logout();
   ui->stackedWidget->setCurrentWidget(loginScreen);
   autoLockManager->reset();
 }
@@ -99,13 +86,4 @@ void MainWindow::closeAllSecondaryWindows() {
       }
     }
   }
-}
-
-bool MainWindow::eventFilter(QObject *obj, QEvent *event) {
-  if (event->type() == QEvent::MouseMove || event->type() == QEvent::KeyPress ||
-      event->type() == QEvent::MouseButtonPress ||
-      event->type() == QEvent::Wheel) {
-    autoLockManager->reset();
-  }
-  return QMainWindow::eventFilter(obj, event);
 }

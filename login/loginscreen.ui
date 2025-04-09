@@ -64,8 +64,26 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
-         <number>24</number>
+         <number>9</number>
         </property>
+        <item>
+         <widget class="QWidget" name="vaultWidget" native="true">
+          <layout class="QVBoxLayout" name="vaultsWidget">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>12</number>
+           </property>
+          </layout>
+         </widget>
+        </item>
         <item>
          <widget class="QLabel" name="label">
           <property name="sizePolicy">
@@ -76,9 +94,6 @@
           </property>
           <property name="text">
            <string>Enter Master Password</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -106,6 +121,13 @@
          <widget class="QPushButton" name="unlockButton">
           <property name="text">
            <string>UnLock</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="manageLockerButton">
+          <property name="text">
+           <string>Manage Locker</string>
           </property>
          </widget>
         </item>

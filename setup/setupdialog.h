@@ -1,6 +1,8 @@
 #ifndef SETUPDIALOG_H
 #define SETUPDIALOG_H
 
+#include "newuserpage.h"
+
 #include <QDialog>
 
 namespace Ui {
@@ -14,9 +16,14 @@ public:
   explicit SetupDialog(QWidget *parent = nullptr);
   ~SetupDialog();
 
+private slots:
+  void showWelcomePage();
+  void handleExistingDataDirectorySelection();
+
 private:
   Ui::SetupDialog *ui;
-  void setMasterPassword();
+
+  NewUserPage *newUserPage = nullptr;
 };
 
 #endif // SETUPDIALOG_H

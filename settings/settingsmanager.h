@@ -29,6 +29,7 @@ private:
   mutable QMutex mutex;
   QSettings *settings;
   QString storageFile;
+  void updateStoragePath();
 };
 
 #endif // SETTINGSMANAGER_H

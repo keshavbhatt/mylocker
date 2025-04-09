@@ -49,6 +49,8 @@ LIBS += -L/usr/lib
 
 SOURCES += \
     categories/categorymanager.cpp \
+    help/whatsthishoverfilter.cpp \
+    locker/managelocker.cpp \
     login/autolockmanager.cpp \
     password/addpassworddialog.cpp \
     password/passwordcard.cpp \
@@ -65,10 +67,17 @@ SOURCES += \
     password/passwordworker.cpp \
     password/storage/passwordstorage.cpp \
     security-manager/securitymanager.cpp \
-    setup/setupdialog.cpp
+    setup/newuserpage.cpp \
+    setup/setupdialog.cpp \
+    vault/vault.cpp \
+    vault/vaultlistwidget.cpp \
+    vault/vaultmanager.cpp \
+    vault/vaultselectiondialog.cpp
 
 HEADERS += \
     categories/categorymanager.h \
+    help/whatsthishoverfilter.h \
+    locker/managelocker.h \
     login/autolockmanager.h \
     password/addpassworddialog.h \
     password/passwordcard.h \
@@ -84,14 +93,21 @@ HEADERS += \
     password/passwordworker.h \
     password/storage/passwordstorage.h \
     security-manager/securitymanager.h \
-    setup/setupdialog.h
+    setup/newuserpage.h \
+    setup/setupdialog.h \
+    vault/vault.h \
+    vault/vaultlistwidget.h \
+    vault/vaultmanager.h \
+    vault/vaultselectiondialog.h
 
 FORMS += \
     dashboard/dashboard.ui \
+    locker/managelocker.ui \
     login/loginscreen.ui \
     mainwindow.ui \
     notes/notesmanager.ui \
     password/passwordmanager.ui \
+    setup/newuserpage.ui \
     setup/setupdialog.ui
 
 # Default rules for deployment
@@ -107,3 +123,6 @@ DATADIR = $$PREFIX/share
 target.path = $$BINDIR
 
 unix:INSTALLS += target
+
+RESOURCES += \
+    icons.qrc

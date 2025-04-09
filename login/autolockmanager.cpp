@@ -1,13 +1,11 @@
 #include "autolockmanager.h"
 #include <QApplication>
 #include <QEvent>
-#include <settings/settingsmanager.h>
 
 AutoLockManager::AutoLockManager(QObject *parent)
     : QObject(parent), remainingTime(0) {
-  int autoLockInterval = SettingsManager::instance()
-                             .getValue("security/auto_lock_time", 30)
-                             .toInt();
+  int autoLockInterval =
+      m_settings.value("security/auto_lock_time", 30).toInt();
 
   autoLockTimer = new QTimer(this);
   autoLockTimer->setInterval(autoLockInterval * 1000);

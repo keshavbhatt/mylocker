@@ -2,6 +2,7 @@
 #define AUTOLOCKMANAGER_H
 
 #include <QObject>
+#include <QSettings>
 #include <QTimer>
 
 class AutoLockManager : public QObject {
@@ -24,6 +25,7 @@ private:
   QTimer *autoLockTimer;
   QTimer *countdownTimer;
   int remainingTime;
+  QSettings m_settings;
 
 private slots:
   void updateRemainingTime();

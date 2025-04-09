@@ -2,19 +2,27 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QStandardPaths>
+#include <vault/vaultmanager.h>
 
-SettingsManager::SettingsManager() {
-  // Default to application settings path
-  // TODO: change this to standardpath config path
-  storageFile = QCoreApplication::applicationDirPath() + "/settings.ini";
-  settings = new QSettings(storageFile, QSettings::IniFormat);
-}
+SettingsManager::SettingsManager() { updateStoragePath(); }
 
 SettingsManager::~SettingsManager() { delete settings; }
 
 SettingsManager &SettingsManager::instance() {
   static SettingsManager instance;
+  instance.updateStoragePath();
   return instance;
+}
+
+void SettingsManager::updateStoragePath() {
+  QString newPath = VaultManager::instance().lockerDataDirPath() +
+                    QDir::separator() + ".settings.ini";
+
+  if (storageFile != newPath) {
+    storageFile = newPath;
+    delete settings;
+    settings = new QSettings(storageFile, QSettings::IniFormat);
+  }
 }
 
 void SettingsManager::setValue(const QString &key, const QVariant &value) {
@@ -48,17 +56,7 @@ int SettingsManager::getClipboardClearDelay() const {
 }
 
 QString SettingsManager::getPasswordStorageFilePath() const {
-  const QString baseDirPath = instance()
-                                  .getValue("paths/password-manager-base-dir",
-                                            QStandardPaths::writableLocation(
-                                                QStandardPaths::DataLocation))
-                                  .toString();
-
-  QDir dir;
-  if (!dir.exists(baseDirPath)) {
-    dir.mkpath(baseDirPath);
-  }
-
+  const QString baseDirPath = VaultManager::instance().currentVaultDir();
   QString fullPath = baseDirPath + QDir::separator() + "passwords.dat";
   return fullPath;
 }
