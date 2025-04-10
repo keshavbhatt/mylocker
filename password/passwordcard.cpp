@@ -1,9 +1,8 @@
 #include "passwordcard.h"
 
-#include "addpassworddialog.h"
-
 #include <QApplication>
 #include <QClipboard>
+#include <QDesktopServices>
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -15,6 +14,8 @@
 #include <QToolTip>
 #include <QVBoxLayout>
 
+#include "addpassworddialog.h"
+#include "utils/layout.h"
 #include <settings/settingsmanager.h>
 
 PasswordCard::PasswordCard(const PasswordEntry &entry, QWidget *parent)
@@ -25,11 +26,12 @@ PasswordCard::PasswordCard(const PasswordEntry &entry, QWidget *parent)
 void PasswordCard::setEntry(const PasswordEntry &entry) { m_entry = entry; }
 
 void PasswordCard::refresh() {
-  m_titleLabel->setText("<b>" + m_entry.title + "</b>");
-  m_userLabel->setText("Username: " + m_entry.username);
-  m_categoryLabel->setText("Category: " + m_entry.category);
-  m_passwordLabel->setText("Password: ••••••••");
-  m_togglePassBtn->setText("Show Password");
+  if (QLayout *oldLayout = this->layout()) {
+    Utils::Layout::clearLayout(oldLayout);
+    delete oldLayout;
+  }
+
+  setupUI();
 }
 
 void PasswordCard::setupUI() {
@@ -40,6 +42,15 @@ void PasswordCard::setupUI() {
   m_passwordLabel = new QLabel("Password: ••••••••", this);
   m_categoryLabel = new QLabel("Category: " + m_entry.category, this);
 
+  m_hidePasswordTimer = new QTimer(this);
+  m_hidePasswordTimer->setSingleShot(true);
+  connect(m_hidePasswordTimer, &QTimer::timeout, this, [this]() {
+    if (m_passwordLabel->text() != "Password: ••••••••") {
+      m_passwordLabel->setText("Password: ••••••••");
+      m_togglePassBtn->setText("Show Password");
+    }
+  });
+
   m_togglePassBtn = new QToolButton(this);
   m_togglePassBtn->setText("Show Password");
   connect(m_togglePassBtn, &QToolButton::clicked, this, [=]() {
@@ -47,7 +58,14 @@ void PasswordCard::setupUI() {
     m_passwordLabel->setText(isHidden ? "Password: " + m_entry.password
                                       : "Password: ••••••••");
     m_togglePassBtn->setText(isHidden ? "Hide Password" : "Show Password");
+
+    if (isHidden) {
+      m_hidePasswordTimer->start(8000);
+    } else {
+      m_hidePasswordTimer->stop();
+    }
   });
+
   m_togglePassBtn->setPopupMode(QToolButton::MenuButtonPopup);
   m_togglePassBtn->setToolTip("Show/Hide Password");
   QMenu *togglePassBtnMenu = new QMenu(m_togglePassBtn);
@@ -56,6 +74,8 @@ void PasswordCard::setupUI() {
   m_togglePassBtn->setMenu(togglePassBtnMenu);
 
   QToolButton *copyPasswordBtn = createCopyToolButton();
+
+  QToolButton *openUrlBtn = createOpenUrlButton();
 
   QToolButton *editToolButton = new QToolButton(this);
   editToolButton->setText("Edit Entry");
@@ -77,6 +97,11 @@ void PasswordCard::setupUI() {
   auto *buttonLayout = new QHBoxLayout();
   buttonLayout->addWidget(m_togglePassBtn);
   buttonLayout->addWidget(copyPasswordBtn);
+
+  if (openUrlBtn) {
+    buttonLayout->addWidget(openUrlBtn);
+  }
+
   buttonLayout->addStretch();
   buttonLayout->addWidget(editToolButton);
 
@@ -176,6 +201,8 @@ void PasswordCard::showEditDialog() {
     PasswordEntry updated = dialog.getPasswordEntry(m_entry.id);
     updated.timestamp = QDateTime::currentDateTime();
 
+    // this will handle update of the card
+    // in password manager
     emit entryEdited(updated);
   }
 }
@@ -241,4 +268,32 @@ void PasswordCard::showFullDetailsDialog() {
 
   dialog->setLayout(mainLayout);
   dialog->exec();
+}
+
+QToolButton *PasswordCard::createOpenUrlButton() {
+  QString urlToOpen = m_entry.url.trimmed();
+
+  if (urlToOpen.isEmpty() && m_entry.title.contains('.')) {
+    urlToOpen = m_entry.title.trimmed();
+  }
+
+  if (!urlToOpen.startsWith("http://") && !urlToOpen.startsWith("https://")) {
+    urlToOpen = "https://" + urlToOpen.toLower();
+  }
+
+  QUrl url(urlToOpen);
+  if (!url.isValid() || url.host().isEmpty()) {
+    return nullptr;
+  }
+
+  QToolButton *openUrlBtn = new QToolButton(this);
+  openUrlBtn->setIcon(QIcon(":/icons/links-line.png"));
+  openUrlBtn->setToolTip(
+      QString("Open '%1' in Web Browser").arg(url.toString()));
+  openUrlBtn->setCursor(Qt::PointingHandCursor);
+
+  connect(openUrlBtn, &QToolButton::clicked, this,
+          [url]() { QDesktopServices::openUrl(url); });
+
+  return openUrlBtn;
 }

@@ -129,8 +129,8 @@ void PasswordManager::handlePasswordUpdated(const PasswordEntry &updatedEntry) {
     if (widget && widget->property("entryId").toUuid() == updatedEntry.id) {
       auto *card = qobject_cast<PasswordCard *>(widget);
       if (card) {
-        card->setEntry(updatedEntry); // update card data
-        card->refresh();              // refresh UI (you'll implement this)
+        card->setEntry(updatedEntry);
+        card->refresh();
       }
       break;
     }

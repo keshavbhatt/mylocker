@@ -30,7 +30,7 @@ APPLICATION_FULLNAME = MyLocker
 DEFINES += APPLICATION_FULLNAME=\\\"$${APPLICATION_FULLNAME}\\\"
 
 # Set program version
-VERSION = 3.0
+VERSION = 0.1
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 
@@ -95,6 +95,7 @@ HEADERS += \
     security-manager/securitymanager.h \
     setup/newuserpage.h \
     setup/setupdialog.h \
+    utils/layout.h \
     vault/vault.h \
     vault/vaultlistwidget.h \
     vault/vaultmanager.h \

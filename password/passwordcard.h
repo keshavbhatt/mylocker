@@ -37,11 +37,13 @@ private:
   QLabel *m_categoryLabel = nullptr;
   QLabel *m_passwordLabel = nullptr;
   QToolButton *m_togglePassBtn = nullptr;
-
   QWidget *m_detailsWidget = nullptr;
+  QTimer *m_hidePasswordTimer = nullptr;
+
   void showFullDetailsDialog();
-  QToolButton *createCopyToolButton();
   void copyToClipboardSecurely(const QString &text);
+  QToolButton *createCopyToolButton();
+  QToolButton *createOpenUrlButton();
 };
 
 #endif // PASSWORDCARD_H
