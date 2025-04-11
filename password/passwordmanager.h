@@ -22,6 +22,9 @@ public:
 signals:
   void goToDashboard();
 
+protected:
+  bool eventFilter(QObject *watched, QEvent *event) override;
+
 private slots:
   void addPasswordClicked();
   void passwordsLoaded(QVector<PasswordEntry> entries);
@@ -31,10 +34,10 @@ private slots:
   void handlePasswordUpdated(const PasswordEntry &updatedEntry);
   void filterEntries(const QString &filterText);
 
-  void updateStackWidget();
-
 private:
   Ui::PasswordManager *ui;
+
+  void updateStackWidget();
   void addPasswordCardToUi(const PasswordEntry &entry);
   void confirmAndDeletePassword(QUuid id);
   void stressTest();

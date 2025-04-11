@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QScrollBar>
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -44,7 +45,22 @@ PasswordManager::PasswordManager(QWidget *parent)
           [this](const QString &text) { filterEntries(text); });
 
   PasswordStorage::instance().loadPasswords();
+
+  ui->backToDashboardButton->installEventFilter(this);
   // stressTest();
+
+  installEventFilter(this);
+}
+
+bool PasswordManager::eventFilter(QObject *watched, QEvent *event) {
+  if (event->type() == QEvent::MouseButtonPress) {
+    QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+    if (mouseEvent->button() == Qt::BackButton) {
+      emit goToDashboard();
+      return true;
+    }
+  }
+  return QWidget::eventFilter(watched, event);
 }
 
 void PasswordManager::stressTest() {
