@@ -52,6 +52,12 @@
      </property>
      <widget class="QWidget" name="notesPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QLineEdit" name="filterEntriesInput">
          <property name="placeholderText">
@@ -72,7 +78,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>499</width>
+            <width>517</width>
             <height>288</height>
            </rect>
           </property>

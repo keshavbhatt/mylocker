@@ -39,6 +39,7 @@ void Dashboard::updateAutoLockLabel(int seconds) {
 void Dashboard::showPasswordManager() {
   if (!passwordManager) {
     passwordManager = new PasswordManager(this);
+    passwordManager->layout()->setContentsMargins(0, 0, 0, 0);
     connect(passwordManager, &PasswordManager::goToDashboard, this,
             [=]() { ui->stackedWidget->setCurrentWidget(ui->mainPage); });
 
@@ -50,6 +51,7 @@ void Dashboard::showPasswordManager() {
 void Dashboard::showNotesManager() {
   if (!notesManager) {
     notesManager = new NotesManager(this);
+    notesManager->layout()->setContentsMargins(0, 0, 0, 0);
     connect(notesManager, &NotesManager::goToDashboard, this,
             [=]() { ui->stackedWidget->setCurrentWidget(ui->mainPage); });
 
