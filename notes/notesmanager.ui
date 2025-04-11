@@ -53,6 +53,16 @@
      <widget class="QWidget" name="notesPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
+        <widget class="QLineEdit" name="filterEntriesInput">
+         <property name="placeholderText">
+          <string>Filter Entries</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QScrollArea" name="scrollArea">
          <property name="widgetResizable">
           <bool>true</bool>
@@ -63,7 +73,7 @@
             <x>0</x>
             <y>0</y>
             <width>499</width>
-            <height>320</height>
+            <height>288</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2"/>

@@ -17,8 +17,17 @@ public:
 signals:
   void goToDashboard();
 
+protected:
+  bool eventFilter(QObject *watched, QEvent *event) override;
+
+private slots:
+  void filterEntries(const QString &filterText);
+  void addNoteClicked();
+
 private:
   Ui::NotesManager *ui;
+
+  void updateStackWidget();
 };
 
 #endif // NOTESMANAGER_H
