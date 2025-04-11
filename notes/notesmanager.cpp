@@ -31,8 +31,7 @@ bool NotesManager::eventFilter(QObject *watched, QEvent *event) {
 
 void NotesManager::updateStackWidget() {
   bool hasEntries = !ui->notesContainer->findChildren<QFrame *>().isEmpty();
-  ui->stackedWidget->setCurrentWidget(hasEntries ? ui->notesPage
-                                                 : ui->noNotesPage);
+  ui->stackedWidget->slideInWgt(hasEntries ? ui->notesPage : ui->noNotesPage);
 }
 
 void NotesManager::addNoteClicked() {

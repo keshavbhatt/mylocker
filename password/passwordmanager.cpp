@@ -159,8 +159,8 @@ void PasswordManager::passwordError(const QString &error) {
 
 void PasswordManager::updateStackWidget() {
   bool hasEntries = !ui->passwordsContainer->findChildren<QFrame *>().isEmpty();
-  ui->stackedWidget->setCurrentWidget(hasEntries ? ui->passwordsPage
-                                                 : ui->noPasswordsPage);
+  ui->stackedWidget->slideInWgt(hasEntries ? ui->passwordsPage
+                                           : ui->noPasswordsPage);
 }
 
 PasswordManager::~PasswordManager() {

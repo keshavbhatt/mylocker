@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QDirIterator>
 #include <QMessageBox>
 
 #include <security-manager/securitymanager.h>
@@ -39,7 +40,7 @@ void MainWindow::showDashboard() {
 
     ui->stackedWidget->addWidget(dashboard);
   }
-  ui->stackedWidget->setCurrentWidget(dashboard);
+  ui->stackedWidget->slideInWgt(dashboard);
 }
 
 void MainWindow::checkForLogout() {
@@ -50,10 +51,10 @@ void MainWindow::checkForLogout() {
   if (logoutRequired) {
     QMessageBox::information(
         this, "Security", "Master password has been set. Please log in again.");
-    ui->stackedWidget->setCurrentWidget(loginScreen);
+    ui->stackedWidget->slideInWgt(loginScreen);
     settings.setValue("security/logout_required", false);
   } else {
-    ui->stackedWidget->setCurrentWidget(loginScreen);
+    ui->stackedWidget->slideInWgt(loginScreen);
   }
 }
 
@@ -61,7 +62,6 @@ void MainWindow::lockApplication() {
 
   closeAllSecondaryWindows();
 
-  // delete dashboard
   if (dashboard) {
     ui->stackedWidget->removeWidget(dashboard);
     dashboard->deleteLater();
@@ -71,7 +71,7 @@ void MainWindow::lockApplication() {
   SecurityManager::clearSessionKey();
 
   loginScreen->logout();
-  ui->stackedWidget->setCurrentWidget(loginScreen);
+  ui->stackedWidget->slideInWgt(loginScreen);
   autoLockManager->reset();
 }
 

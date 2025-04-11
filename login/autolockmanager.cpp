@@ -29,6 +29,7 @@ void AutoLockManager::reset() {
   remainingTime = autoLockTimer->interval() / 1000;
   autoLockTimer->start();
   countdownTimer->start(1000);
+  emit remainingTimeUpdated(remainingTime);
 }
 
 void AutoLockManager::setLockInterval(int seconds) {

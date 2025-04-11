@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -46,6 +46,10 @@ LIBS += -lssl -lcrypto
 # Include OpenSSL headers
 INCLUDEPATH += /usr/include
 LIBS += -L/usr/lib
+
+include(widgets/smart_layout/SmartLayout.pri)
+include(widgets/sliding_stacked_widget/SlidingStackedWidget.pri)
+include(widgets/waiting_spinner/WaitingSpinner.pri)
 
 SOURCES += \
     categories/categorymanager.cpp \
@@ -126,4 +130,4 @@ target.path = $$BINDIR
 unix:INSTALLS += target
 
 RESOURCES += \
-    icons.qrc
+    icons/icons.qrc

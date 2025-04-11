@@ -41,11 +41,11 @@ void Dashboard::showPasswordManager() {
     passwordManager = new PasswordManager(this);
     passwordManager->layout()->setContentsMargins(0, 0, 0, 0);
     connect(passwordManager, &PasswordManager::goToDashboard, this,
-            [=]() { ui->stackedWidget->setCurrentWidget(ui->mainPage); });
+            [=]() { ui->stackedWidget->slideInWgt(ui->mainPage); });
 
     ui->stackedWidget->addWidget(passwordManager);
   }
-  ui->stackedWidget->setCurrentWidget(passwordManager);
+  ui->stackedWidget->slideInWgt(passwordManager);
 }
 
 void Dashboard::showNotesManager() {
@@ -53,9 +53,9 @@ void Dashboard::showNotesManager() {
     notesManager = new NotesManager(this);
     notesManager->layout()->setContentsMargins(0, 0, 0, 0);
     connect(notesManager, &NotesManager::goToDashboard, this,
-            [=]() { ui->stackedWidget->setCurrentWidget(ui->mainPage); });
+            [=]() { ui->stackedWidget->slideInWgt(ui->mainPage); });
 
     ui->stackedWidget->addWidget(notesManager);
   }
-  ui->stackedWidget->setCurrentWidget(notesManager);
+  ui->stackedWidget->slideInWgt(notesManager);
 }

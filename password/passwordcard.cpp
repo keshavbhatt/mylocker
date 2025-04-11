@@ -287,7 +287,7 @@ QToolButton *PasswordCard::createOpenUrlButton() {
   }
 
   QToolButton *openUrlBtn = new QToolButton(this);
-  openUrlBtn->setIcon(QIcon(":/icons/links-line.png"));
+  openUrlBtn->setIcon(QIcon(":/icons/svg/links-line.svg"));
   openUrlBtn->setToolTip(
       QString("Open '%1' in Web Browser").arg(url.toString()));
   openUrlBtn->setCursor(Qt::PointingHandCursor);

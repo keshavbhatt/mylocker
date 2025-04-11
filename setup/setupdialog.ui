@@ -43,7 +43,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QStackedWidget" name="stackedWidget">
+    <widget class="SlidingStackedWidget" name="stackedWidget">
      <widget class="QWidget" name="page_welcome">
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
@@ -168,6 +168,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SlidingStackedWidget</class>
+   <extends>QStackedWidget</extends>
+   <header>slidingstackedwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

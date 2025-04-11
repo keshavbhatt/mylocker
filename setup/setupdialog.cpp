@@ -30,13 +30,13 @@ SetupDialog::SetupDialog(QWidget *parent)
           &SetupDialog::handleExistingDataDirectorySelection);
 
   connect(ui->newUser, &QPushButton::clicked, this,
-          [=]() { ui->stackedWidget->setCurrentWidget(newUserPage); });
+          [=]() { ui->stackedWidget->slideInWgt(newUserPage); });
 
-  ui->stackedWidget->setCurrentWidget(ui->page_welcome);
+  ui->stackedWidget->slideInWgt(ui->page_welcome);
 }
 
 void SetupDialog::showWelcomePage() {
-  ui->stackedWidget->setCurrentWidget(ui->page_welcome);
+  ui->stackedWidget->slideInWgt(ui->page_welcome);
 }
 
 void SetupDialog::handleExistingDataDirectorySelection() {

@@ -27,7 +27,8 @@ NewUserPage::NewUserPage(QWidget *parent)
 
   QAction *selectNewDataDirectoryAction = new QAction(this);
   selectNewDataDirectoryAction->setText("Click to Select new Locker Directory");
-  selectNewDataDirectoryAction->setIcon(QIcon(":/icons/folder-open-line.png"));
+  selectNewDataDirectoryAction->setIcon(
+      QIcon(":/icons/svg/folder-open-line.svg"));
 
   ui->newDataDirectoryLineEdit->installEventFilter(this);
   ui->newDataDirectoryLineEdit->setReadOnly(true);
