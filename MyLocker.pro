@@ -54,6 +54,8 @@ include(widgets/waiting_spinner/WaitingSpinner.pri)
 SOURCES += \
     categories/categorymanager.cpp \
     help/whatsthishoverfilter.cpp \
+    icons/iconloader.cpp \
+    icons/iconpickerdialog.cpp \
     locker/managelocker.cpp \
     login/autolockmanager.cpp \
     password/addpassworddialog.cpp \
@@ -81,6 +83,8 @@ SOURCES += \
 HEADERS += \
     categories/categorymanager.h \
     help/whatsthishoverfilter.h \
+    icons/iconloader.h \
+    icons/iconpickerdialog.h \
     locker/managelocker.h \
     login/autolockmanager.h \
     password/addpassworddialog.h \
@@ -99,6 +103,7 @@ HEADERS += \
     security-manager/securitymanager.h \
     setup/newuserpage.h \
     setup/setupdialog.h \
+    utils/debouncer.h \
     utils/layout.h \
     vault/vault.h \
     vault/vaultlistwidget.h \

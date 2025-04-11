@@ -7,6 +7,8 @@
 
 #include <security-manager/securitymanager.h>
 
+#include <icons/iconpickerdialog.h>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
 
