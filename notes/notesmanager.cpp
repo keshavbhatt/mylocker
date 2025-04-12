@@ -1,21 +1,31 @@
 #include "notesmanager.h"
 #include "ui_notesmanager.h"
 
-#include <QDebug>
-#include <QMouseEvent>
-
 NotesManager::NotesManager(QWidget *parent)
     : QWidget(parent), ui(new Ui::NotesManager) {
   ui->setupUi(this);
 
-  connect(ui->backToDashboardButton, &QPushButton::clicked, this,
-          &NotesManager::goToDashboard);
-  connect(ui->addNoteButton, &QPushButton::clicked, this,
-          &NotesManager::addNoteClicked);
+  ui->scrollArea->verticalScrollBar()->setSingleStep(30);
+  ui->notesContainer->layout()->setAlignment(Qt::AlignTop);
+
   connect(ui->filterEntriesInput, &QLineEdit::textChanged, this,
           [this](const QString &text) { filterEntries(text); });
 
+  ui->backToDashboardButton->setIconSize(QSize(22, 22));
+  ui->backToDashboardButton->setIcon(Utils::IconLoader::loadColoredIcon(
+      "arrow-left-circle-fill", Palette::iconPrimary()));
+  connect(ui->backToDashboardButton, &QPushButton::clicked, this,
+          &NotesManager::goToDashboard);
+
+  ui->addNoteButton->setIconSize(QSize(22, 22));
+  ui->addNoteButton->setIcon(Utils::IconLoader::loadColoredIcon(
+      "add-circle-fill", Palette::iconSuccess()));
+  connect(ui->addNoteButton, &QPushButton::clicked, this,
+          &NotesManager::addNoteClicked);
+
   installEventFilter(this);
+
+  updateStackWidget(); // TODO remove this, storage shoudl call this on load
 }
 
 bool NotesManager::eventFilter(QObject *watched, QEvent *event) {
@@ -27,6 +37,11 @@ bool NotesManager::eventFilter(QObject *watched, QEvent *event) {
     }
   }
   return QWidget::eventFilter(watched, event);
+}
+
+NotesManager::~NotesManager() {
+  qDebug() << "Deleted NotesManager";
+  delete ui;
 }
 
 void NotesManager::updateStackWidget() {
@@ -58,9 +73,4 @@ void NotesManager::filterEntries(const QString &filterText) {
   //     card->setVisible(matches);
   //   }
   // }
-}
-
-NotesManager::~NotesManager() {
-  qDebug() << "Deleted NotesManager";
-  delete ui;
 }

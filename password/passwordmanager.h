@@ -1,11 +1,25 @@
 #ifndef PASSWORDMANAGER_H
 #define PASSWORDMANAGER_H
 
+#include "addpassworddialog.h"
+#include "passwordcard.h"
 #include "passwordworker.h"
+#include <categories/categorymanager.h>
+#include <password/storage/passwordstorage.h>
+#include <vault/vaultmanager.h>
 
+#include <QCheckBox>
+#include <QClipboard>
 #include <QComboBox>
+#include <QDebug>
 #include <QFrame>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QMouseEvent>
+#include <QScrollBar>
+#include <QTextEdit>
 #include <QUuid>
+#include <QVBoxLayout>
 #include <QWidget>
 
 namespace Ui {

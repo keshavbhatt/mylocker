@@ -1,13 +1,15 @@
 #ifndef DASHBOARD_H
 #define DASHBOARD_H
 
+#include <QDebug>
 #include <QWidget>
 
+#include <icons/iconloader.h>
 #include <login/autolockmanager.h>
-
-#include <password/passwordmanager.h>
-
 #include <notes/notesmanager.h>
+#include <password/passwordmanager.h>
+#include <theme/palette.h>
+#include <vault/vaultmanager.h>
 
 namespace Ui {
 class Dashboard;
@@ -23,6 +25,9 @@ public:
 
 signals:
   void lockApplicationRequested();
+
+protected slots:
+  bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
   Ui::Dashboard *ui;

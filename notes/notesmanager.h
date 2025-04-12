@@ -1,7 +1,13 @@
 #ifndef NOTESMANAGER_H
 #define NOTESMANAGER_H
 
+#include <QDebug>
+#include <QMouseEvent>
+#include <QScrollBar>
 #include <QWidget>
+
+#include <icons/iconloader.h>
+#include <theme/palette.h>
 
 namespace Ui {
 class NotesManager;

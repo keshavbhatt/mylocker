@@ -57,6 +57,7 @@ SOURCES += \
     icons/iconloader.cpp \
     icons/iconpickerdialog.cpp \
     locker/managelocker.cpp \
+    locker/vaultcreationdialog.cpp \
     login/autolockmanager.cpp \
     password/addpassworddialog.cpp \
     password/passwordcard.cpp \
@@ -75,6 +76,7 @@ SOURCES += \
     security-manager/securitymanager.cpp \
     setup/newuserpage.cpp \
     setup/setupdialog.cpp \
+    theme/palette.cpp \
     vault/vault.cpp \
     vault/vaultlistwidget.cpp \
     vault/vaultmanager.cpp \
@@ -86,6 +88,7 @@ HEADERS += \
     icons/iconloader.h \
     icons/iconpickerdialog.h \
     locker/managelocker.h \
+    locker/vaultcreationdialog.h \
     login/autolockmanager.h \
     password/addpassworddialog.h \
     password/passwordcard.h \
@@ -103,6 +106,7 @@ HEADERS += \
     security-manager/securitymanager.h \
     setup/newuserpage.h \
     setup/setupdialog.h \
+    theme/palette.h \
     utils/debouncer.h \
     utils/layout.h \
     vault/vault.h \

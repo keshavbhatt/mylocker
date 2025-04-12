@@ -20,13 +20,14 @@ public:
 private slots:
   void deleteSelectedVault();
   void createNewVault();
+  void editSelectedVault();
+  void updateVaultActionButtons();
 
 private:
   QString m_lockerDataDirPath;
   Ui::ManageLocker *ui;
 
   VaultListWidget *vaultListWidget = nullptr;
-  void updateVaultActionButtons(const QString &vaultName);
 };
 
 #endif // MANAGELOCKER_H

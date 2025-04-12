@@ -20,6 +20,8 @@ public:
 
   QString selectedIconName() const;
   QColor selectedColor() const;
+  void setSelectedColor(const QColor &newSelectedColor);
+  void setSelectedIcon(const QString &newSelectedIcon);
 
 private slots:
   void chooseColor();
@@ -42,6 +44,7 @@ private:
   QPushButton *m_okButton;
   Utils::Debouncer *m_filterDebouncer;
   QLineEdit *m_searchBox;
+  void updateColorPreview();
 };
 
 #endif // ICONPICKERDIALOG_H

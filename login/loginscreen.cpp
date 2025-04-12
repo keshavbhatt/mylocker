@@ -5,11 +5,11 @@
 #include <QMessageBox>
 #include <QTimer>
 
-#include <security-manager/securitymanager.h>
-
-#include <vault/vaultmanager.h>
-
+#include <icons/iconloader.h>
 #include <locker/managelocker.h>
+#include <security-manager/securitymanager.h>
+#include <theme/palette.h>
+#include <vault/vaultmanager.h>
 
 LoginScreen::LoginScreen(QWidget *parent)
     : QWidget(parent), ui(new Ui::LoginScreen) {
@@ -21,9 +21,16 @@ LoginScreen::LoginScreen(QWidget *parent)
 
   connect(ui->passwordInput, &QLineEdit::returnPressed, this,
           &LoginScreen::onUnlockClicked);
+
+  ui->unlockButton->setIconSize(QSize(22, 22));
+  ui->unlockButton->setIcon(Utils::IconLoader::loadColoredIcon(
+      "lock-unlock-fill", Palette::iconSuccess()));
   connect(ui->unlockButton, &QPushButton::clicked, this,
           &LoginScreen::onUnlockClicked);
 
+  ui->manageLockerButton->setIconSize(QSize(22, 22));
+  ui->manageLockerButton->setIcon(Utils::IconLoader::loadColoredIcon(
+      "folder-settings-fill", Palette::iconInfo()));
   connect(ui->manageLockerButton, &QPushButton::clicked, this,
           &LoginScreen::onManageLockerClicked);
 

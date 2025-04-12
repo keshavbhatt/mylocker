@@ -1,29 +1,15 @@
 #include "passwordmanager.h"
-#include "addpassworddialog.h"
-#include "passwordcard.h"
 #include "ui_passwordmanager.h"
 
-#include <QCheckBox>
-#include <QClipboard>
-#include <QComboBox>
-#include <QDebug>
-#include <QLineEdit>
-#include <QMessageBox>
-#include <QMouseEvent>
-#include <QScrollBar>
-#include <QTextEdit>
-#include <QVBoxLayout>
-#include <password/storage/passwordstorage.h>
-#include <vault/vaultmanager.h>
+#include <icons/iconloader.h>
 
-#include <categories/categorymanager.h>
+#include <theme/palette.h>
 
 PasswordManager::PasswordManager(QWidget *parent)
     : QWidget(parent), ui(new Ui::PasswordManager) {
   ui->setupUi(this);
 
   ui->scrollArea->verticalScrollBar()->setSingleStep(30);
-
   ui->passwordsContainer->layout()->setAlignment(Qt::AlignTop);
 
   connect(&PasswordStorage::instance(), &PasswordStorage::passwordsLoaded, this,
@@ -37,16 +23,23 @@ PasswordManager::PasswordManager(QWidget *parent)
   connect(&PasswordStorage::instance(), &PasswordStorage::passwordUpdated, this,
           &PasswordManager::handlePasswordUpdated);
 
-  connect(ui->backToDashboardButton, &QPushButton::clicked, this,
-          &PasswordManager::goToDashboard);
-  connect(ui->addPasswordButton, &QPushButton::clicked, this,
-          &PasswordManager::addPasswordClicked);
   connect(ui->filterEntriesInput, &QLineEdit::textChanged, this,
           [this](const QString &text) { filterEntries(text); });
 
+  ui->backToDashboardButton->setIconSize(QSize(22, 22));
+  ui->backToDashboardButton->setIcon(Utils::IconLoader::loadColoredIcon(
+      "arrow-left-circle-fill", Palette::iconPrimary()));
+  connect(ui->backToDashboardButton, &QPushButton::clicked, this,
+          &PasswordManager::goToDashboard);
+
+  ui->addPasswordButton->setIconSize(QSize(22, 22));
+  ui->addPasswordButton->setIcon(Utils::IconLoader::loadColoredIcon(
+      "add-circle-fill", Palette::iconSuccess()));
+  connect(ui->addPasswordButton, &QPushButton::clicked, this,
+          &PasswordManager::addPasswordClicked);
+
   PasswordStorage::instance().loadPasswords();
 
-  ui->backToDashboardButton->installEventFilter(this);
   // stressTest();
 
   installEventFilter(this);
@@ -61,6 +54,11 @@ bool PasswordManager::eventFilter(QObject *watched, QEvent *event) {
     }
   }
   return QWidget::eventFilter(watched, event);
+}
+
+PasswordManager::~PasswordManager() {
+  qDebug() << "Deleted PasswordManager";
+  delete ui;
 }
 
 void PasswordManager::stressTest() {
@@ -161,11 +159,6 @@ void PasswordManager::updateStackWidget() {
   bool hasEntries = !ui->passwordsContainer->findChildren<QFrame *>().isEmpty();
   ui->stackedWidget->slideInWgt(hasEntries ? ui->passwordsPage
                                            : ui->noPasswordsPage);
-}
-
-PasswordManager::~PasswordManager() {
-  qDebug() << "Deleted PasswordManager";
-  delete ui;
 }
 
 void PasswordManager::addPasswordClicked() {

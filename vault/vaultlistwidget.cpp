@@ -1,21 +1,34 @@
 #include "vaultlistwidget.h"
 
+#include "icons/iconloader.h"
 #include <QDir>
 #include <QFileInfoList>
 #include <QLabel>
 #include <QSettings>
 #include <QVBoxLayout>
+#include <theme/palette.h>
 
-VaultListWidget::VaultListWidget(QWidget *parent)
-    : QWidget(parent), vaultListWidget(new QListWidget(this)) {
+VaultListWidget::VaultListWidget(QWidget *parent, const bool &embded)
+    : QWidget(parent), vaultListWidget(new QListWidget(this)),
+      m_isEmbeded(embded) {
   QVBoxLayout *layout = new QVBoxLayout(this);
   m_vaultLabel = new QLabel("");
   layout->addWidget(m_vaultLabel);
+
+  if (m_isEmbeded) {
+    m_vaultLabel->setVisible(false);
+  }
+
+  vaultListWidget->setIconSize(QSize(32, 32));
   layout->addWidget(vaultListWidget);
   layout->setContentsMargins(0, 0, 0, 0);
 
   connect(vaultListWidget, &QListWidget::currentTextChanged, this,
           &VaultListWidget::vaultSelectionChanged);
+}
+
+bool VaultListWidget::hasItemSelected() {
+  return vaultListWidget->currentRow() >= 0;
 }
 
 void VaultListWidget::loadFromDirectory(const QString &directoryPath) {
@@ -25,11 +38,30 @@ void VaultListWidget::loadFromDirectory(const QString &directoryPath) {
   const QFileInfoList entries =
       dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
-  // Add all entries to the list widget
   for (const QFileInfo &entry : entries) {
-    vaultListWidget->addItem(entry.fileName());
+    QListWidgetItem *item = new QListWidgetItem(entry.fileName());
+
+    QSettings meta(entry.filePath() + QDir::separator() + ".vault.meta",
+                   QSettings::IniFormat);
+    QString iconName = meta.value("Vault/icon").toString();
+    QString iconColor = meta.value("Vault/color").toString();
+
+    if (!iconName.isEmpty()) {
+      QColor color =
+          iconColor.isEmpty() ? Palette::iconDefault() : QColor(iconColor);
+      QIcon icon = Utils::IconLoader::loadColoredIcon(iconName, color);
+      item->setIcon(icon);
+    }
+
+    vaultListWidget->addItem(item);
   }
 
+  if (m_isEmbeded == false) {
+    selectCurrentListItemFromSettings();
+  }
+}
+
+void VaultListWidget::selectCurrentListItemFromSettings() {
   if (vaultListWidget->count() > 0) {
     QSettings settings;
     QString lastOpenedVaultName =

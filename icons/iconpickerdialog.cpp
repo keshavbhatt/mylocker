@@ -2,6 +2,7 @@
 
 #include "iconloader.h"
 #include <QColorDialog>
+#include <QDebug>
 #include <QFileInfo>
 #include <QPushButton>
 #include <QToolTip>
@@ -39,9 +40,7 @@ void IconPickerDialog::setupUi() {
 
   m_colorPreview = new QLabel();
   m_colorPreview->setFixedSize(24, 24);
-  m_colorPreview->setStyleSheet(
-      QString("background: %1; border: 1px solid black;")
-          .arg(m_selectedColor.name()));
+  updateColorPreview();
   searchBarLayout->addWidget(m_colorPreview);
 
   m_colorButton = new QPushButton("Choose Color");
@@ -126,10 +125,7 @@ void IconPickerDialog::chooseColor() {
   if (color.isValid()) {
     m_selectedColor = color;
     m_settings.setValue("iconPicker/lastColor", m_selectedColor);
-    m_colorPreview->setStyleSheet(
-        QString("background: %1; border: 1px solid black;")
-            .arg(m_selectedColor.name()));
-
+    updateColorPreview();
     updateIconColors();
   }
 }
@@ -166,3 +162,34 @@ void IconPickerDialog::applyFilter(const QString &text) {
 QString IconPickerDialog::selectedIconName() const { return m_selectedIcon; }
 
 QColor IconPickerDialog::selectedColor() const { return m_selectedColor; }
+
+void IconPickerDialog::setSelectedIcon(const QString &newSelectedIcon) {
+  for (int i = 0; i < m_listWidget->count(); ++i) {
+    QListWidgetItem *item = m_listWidget->item(i);
+    if (item->text() == newSelectedIcon) {
+      m_listWidget->setCurrentItem(item);
+      m_selectedIcon = newSelectedIcon;
+      return;
+    }
+  }
+
+  qWarning() << "Icon not found in list:" << newSelectedIcon;
+}
+
+void IconPickerDialog::setSelectedColor(const QColor &newSelectedColor) {
+  if (!newSelectedColor.isValid()) {
+    qWarning() << "Invalid color provided to setSelectedColor()";
+    return;
+  }
+
+  m_selectedColor = newSelectedColor;
+
+  updateColorPreview();
+  updateIconColors();
+}
+
+void IconPickerDialog::updateColorPreview() {
+  QPixmap pix(24, 24);
+  pix.fill(m_selectedColor);
+  m_colorPreview->setPixmap(pix);
+}

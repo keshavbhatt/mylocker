@@ -13,13 +13,17 @@ signals:
   void vaultSelectionChanged(const QString &vaultName);
 
 public:
-  explicit VaultListWidget(QWidget *parent = nullptr);
+  explicit VaultListWidget(QWidget *parent = nullptr,
+                           const bool &embded = false);
 
   void loadFromDirectory(const QString &directoryPath);
   QString selectedVaultName() const;
   QLabel *m_vaultLabel = nullptr;
 
-private:
+  bool hasItemSelected();
+  private:
   QListWidget *vaultListWidget;
+  bool m_isEmbeded;
+  void selectCurrentListItemFromSettings();
 };
 #endif // VAULTLISTWIDGET_H
