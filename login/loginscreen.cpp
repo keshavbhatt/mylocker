@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QMessageBox>
+#include <QTimer>
 
 #include <security-manager/securitymanager.h>
 
@@ -38,13 +39,14 @@ void LoginScreen::logout() {
 
 void LoginScreen::onUnlockClicked() {
   const QString password = ui->passwordInput->text().trimmed();
-
   if (password.isEmpty()) {
     showError("Please enter your master password.");
     return;
   }
 
   if (SecurityManager::validateMasterPassword(password)) {
+    ui->passwordInput->clear();
+
     Vault newVault(m_vaultListWidget->selectedVaultName());
 
     auto lockerDataDirPath = m_settings.value("lockerDataDirPath").toString();
@@ -54,8 +56,7 @@ void LoginScreen::onUnlockClicked() {
       return;
     }
 
-    resetUi();
-    emit loginSuccessful();
+    QTimer::singleShot(200, this, [=]() { emit loginSuccessful(); });
   } else {
     showError("Invalid password. Try again.");
   }
@@ -73,13 +74,13 @@ void LoginScreen::onManageLockerClicked() {
     auto lockerDataDirPath = m_settings.value("lockerDataDirPath").toString();
     ui->passwordInput->clear();
     ui->errorLabel->hide();
-    manageLocker(lockerDataDirPath);
+    openManageLocker(lockerDataDirPath);
   } else {
     showError("Invalid password. Try again.");
   }
 }
 
-void LoginScreen::manageLocker(const QString &lockerDataDirPath) {
+void LoginScreen::openManageLocker(const QString &lockerDataDirPath) {
   ManageLocker *manageLocker = new ManageLocker(lockerDataDirPath, this);
   manageLocker->setWindowTitle(QApplication::applicationName() +
                                " | Manage Locker");

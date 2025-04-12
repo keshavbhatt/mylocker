@@ -33,7 +33,7 @@ private:
   void loadVaults();
   QSettings m_settings;
   VaultListWidget *m_vaultListWidget = nullptr;
-  void manageLocker(const QString &lockerDataDirPath);
+  void openManageLocker(const QString &lockerDataDirPath);
 };
 
 #endif // LOGINSCREEN_H

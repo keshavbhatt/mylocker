@@ -39,7 +39,9 @@ public:
        };
        SlidingStackedWidget(QWidget *parent);
 
-public slots:
+       int speed() const;
+
+   public slots:
        //! Set animation speed
        void setSpeed(int speed);
        //! Set easing curve

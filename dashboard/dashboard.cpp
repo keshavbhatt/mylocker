@@ -17,6 +17,8 @@ Dashboard::Dashboard(QWidget *parent) : QWidget(parent), ui(new Ui::Dashboard) {
           &Dashboard::showNotesManager);
   connect(ui->lockNowButton, &QPushButton::clicked, this,
           &Dashboard::lockApplicationRequested);
+
+  ui->stackedWidget->setCurrentWidget(ui->mainPage);
 }
 
 Dashboard::~Dashboard() {

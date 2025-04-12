@@ -62,18 +62,21 @@ void MainWindow::checkForLogout() {
 
 void MainWindow::lockApplication() {
 
-  closeAllSecondaryWindows();
-
-  if (dashboard) {
-    ui->stackedWidget->removeWidget(dashboard);
-    dashboard->deleteLater();
-    dashboard = nullptr;
-  }
-
   SecurityManager::clearSessionKey();
 
-  loginScreen->logout();
+  closeAllSecondaryWindows();
+
+  QTimer::singleShot(ui->stackedWidget->speed(), this, [this]() {
+    loginScreen->logout();
+    if (dashboard) {
+      ui->stackedWidget->removeWidget(dashboard);
+      delete dashboard;
+      dashboard = nullptr;
+    }
+  });
+
   ui->stackedWidget->slideInWgt(loginScreen);
+
   autoLockManager->reset();
 }
 
