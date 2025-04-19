@@ -50,6 +50,8 @@ LIBS += -L/usr/lib
 include(widgets/smart_layout/SmartLayout.pri)
 include(widgets/sliding_stacked_widget/SlidingStackedWidget.pri)
 include(widgets/waiting_spinner/WaitingSpinner.pri)
+include(widgets/password_lineedit/PasswordLineEdit.pri)
+
 
 SOURCES += \
     categories/categorymanager.cpp \

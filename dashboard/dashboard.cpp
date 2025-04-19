@@ -8,13 +8,13 @@ Dashboard::Dashboard(QWidget *parent) : QWidget(parent), ui(new Ui::Dashboard) {
       QString("Opened Vault: %1")
           .arg(VaultManager::instance().currentVault().name()));
 
-  ui->passwordManagerButton->setIconSize(QSize(48, 48));
+  ui->passwordManagerButton->setIconSize(QSize(22, 22));
   ui->passwordManagerButton->setIcon(
       Utils::IconLoader::loadColoredIcon("key-2-fill", Palette::iconPrimary()));
   connect(ui->passwordManagerButton, &QPushButton::clicked, this,
           &Dashboard::showPasswordManager);
 
-  ui->secureNotesButton->setIconSize(QSize(48, 48));
+  ui->secureNotesButton->setIconSize(QSize(22, 22));
   ui->secureNotesButton->setIcon(Utils::IconLoader::loadColoredIcon(
       "sticky-note-fill", Palette::iconWarning()));
   connect(ui->secureNotesButton, &QPushButton::clicked, this,

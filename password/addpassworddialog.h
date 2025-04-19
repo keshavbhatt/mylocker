@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <passwordlineedit.h>
 
 class AddPasswordDialog : public QDialog {
   Q_OBJECT
@@ -24,7 +25,7 @@ public:
 private:
   QLineEdit *siteInput;
   QLineEdit *usernameInput;
-  QLineEdit *passwordInput;
+  PasswordLineEdit *passwordInput;
   QLineEdit *urlInput;
   QTextEdit *notesInput;
   QComboBox *categoryCombo;
@@ -32,7 +33,8 @@ private:
 
   QPushButton *saveBtn;
   QPushButton *cancelBtn;
-  QToolButton *createPasswordGeneratorButton(QLineEdit *targetInput, QWidget *parent);
+  QToolButton *createPasswordGeneratorButton(QLineEdit *targetInput,
+                                             QWidget *parent);
 };
 
 #endif // ADDPASSWORDDIALOG_H

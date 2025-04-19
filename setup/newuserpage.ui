@@ -116,7 +116,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="3" column="1">
-            <widget class="QLineEdit" name="confirmMasterPasswordLineEdit">
+            <widget class="PasswordLineEdit" name="confirmMasterPasswordLineEdit">
              <property name="echoMode">
               <enum>QLineEdit::Password</enum>
              </property>
@@ -133,7 +133,7 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="masterPasswordLineEdit">
+            <widget class="PasswordLineEdit" name="masterPasswordLineEdit">
              <property name="echoMode">
               <enum>QLineEdit::Password</enum>
              </property>
@@ -221,6 +221,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PasswordLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>passwordlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>newDataDirectoryLineEdit</tabstop>
   <tabstop>newVaultNameLineEdit</tabstop>

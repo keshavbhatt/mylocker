@@ -25,9 +25,9 @@ AddPasswordDialog::AddPasswordDialog(const PasswordEntry &entry,
 
 AddPasswordDialog::AddPasswordDialog(QWidget *parent)
     : QDialog(parent), siteInput(new QLineEdit(this)),
-      usernameInput(new QLineEdit(this)), passwordInput(new QLineEdit(this)),
-      urlInput(new QLineEdit(this)), notesInput(new QTextEdit(this)),
-      categoryCombo(new QComboBox(this)),
+      usernameInput(new QLineEdit(this)),
+      passwordInput(new PasswordLineEdit(this)), urlInput(new QLineEdit(this)),
+      notesInput(new QTextEdit(this)), categoryCombo(new QComboBox(this)),
       extendedGroup(new QGroupBox("More Details", this)),
       saveBtn(new QPushButton("Save", this)),
       cancelBtn(new QPushButton("Cancel", this)) {
