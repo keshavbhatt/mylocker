@@ -1,12 +1,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QDebug>
+#include <QDirIterator>
 #include <QMainWindow>
 #include <QMenu>
+#include <QMessageBox>
 
 #include <dashboard/dashboard.h>
+#include <icons/iconpickerdialog.h>
 #include <login/autolockmanager.h>
 #include <login/loginscreen.h>
+#include <security-manager/securitymanager.h>
 #include <settings/settingsmanager.h>
 
 namespace Ui {

@@ -1,14 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QDebug>
-#include <QDirIterator>
-#include <QMessageBox>
-
-#include <security-manager/securitymanager.h>
-
-#include <icons/iconpickerdialog.h>
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
 

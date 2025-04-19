@@ -92,8 +92,10 @@ HEADERS += \
     locker/managelocker.h \
     locker/vaultcreationdialog.h \
     login/autolockmanager.h \
+    notes/noteentry.h \
     password/addpassworddialog.h \
     password/passwordcard.h \
+    password/passwordentry.h \
     password/passwordgenerator.h \
     password/passwordgeneratordialog.h \
     settings/settingsmanager.h \
