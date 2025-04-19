@@ -1,13 +1,5 @@
 #include "addpassworddialog.h"
 
-#include <QLabel>
-#include <QMenu>
-#include <QToolButton>
-
-#include "passwordgenerator.h"
-#include "passwordgeneratordialog.h"
-#include <categories/categorymanager.h>
-
 AddPasswordDialog::AddPasswordDialog(const PasswordEntry &entry,
                                      QWidget *parent)
     : AddPasswordDialog(parent) {
@@ -143,7 +135,7 @@ AddPasswordDialog::getPasswordEntry(const QUuid &existingId) const {
   entry.title = siteInput->text();
   entry.username = usernameInput->text();
   entry.password = passwordInput->text();
-  entry.timestamp = QDateTime::currentDateTime();
+  entry.updatedAt = QDateTime::currentDateTime();
   entry.category = categoryCombo->currentText();
 
   if (extendedGroup->isChecked()) {

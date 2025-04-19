@@ -3,7 +3,6 @@
 
 #include "addpassworddialog.h"
 #include "passwordcard.h"
-#include "passwordworker.h"
 #include <categories/categorymanager.h>
 #include <password/storage/passwordstorage.h>
 #include <vault/vaultmanager.h>

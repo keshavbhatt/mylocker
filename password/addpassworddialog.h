@@ -1,15 +1,21 @@
 #ifndef ADDPASSWORDDIALOG_H
 #define ADDPASSWORDDIALOG_H
 
-#include "passwordworker.h"
-
 #include <QComboBox>
 #include <QDialog>
 #include <QGroupBox>
+#include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QToolButton>
 #include <QVBoxLayout>
+
+#include "passwordentry.h"
+#include "passwordgenerator.h"
+#include "passwordgeneratordialog.h"
+#include <categories/categorymanager.h>
 #include <passwordlineedit.h>
 
 class AddPasswordDialog : public QDialog {

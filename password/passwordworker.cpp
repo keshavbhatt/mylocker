@@ -62,7 +62,7 @@ void PasswordWorker::updateEntry(const PasswordEntry &updatedEntry) {
       entry.title = updatedEntry.title;
       entry.username = updatedEntry.username;
       entry.password = updatedEntry.password;
-      entry.timestamp = QDateTime::currentDateTime();
+      entry.updatedAt = QDateTime::currentDateTime();
       entry.url = updatedEntry.url;
       entry.notes = updatedEntry.notes;
       entry.category = updatedEntry.category;
@@ -124,7 +124,8 @@ QVector<PasswordEntry> PasswordWorker::loadInternal() {
 
     PasswordEntry entry;
     entryIn >> entry.id >> entry.title >> entry.username >> entry.password >>
-        entry.timestamp >> entry.url >> entry.notes >> entry.category;
+        entry.createdAt >> entry.updatedAt >> entry.url >> entry.notes >>
+        entry.category;
 
     if (!entry.id.isNull() && !entry.title.isEmpty()) {
       entries.append(entry);
@@ -160,7 +161,8 @@ bool PasswordWorker::saveInternal(const QVector<PasswordEntry> &entries) {
     QByteArray serialized;
     QDataStream entryOut(&serialized, QIODevice::WriteOnly);
     entryOut << entry.id << entry.title << entry.username << entry.password
-             << entry.timestamp << entry.url << entry.notes << entry.category;
+             << entry.createdAt << entry.updatedAt << entry.url << entry.notes
+             << entry.category;
 
     QByteArray encrypted = Encryptor::encrypt(serialized, key, iv);
     out << encrypted;

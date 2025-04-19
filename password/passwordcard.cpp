@@ -1,23 +1,5 @@
 #include "passwordcard.h"
 
-#include <QApplication>
-#include <QClipboard>
-#include <QDesktopServices>
-#include <QDialog>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QMenu>
-#include <QPushButton>
-#include <QScrollArea>
-#include <QTimer>
-#include <QToolButton>
-#include <QToolTip>
-#include <QVBoxLayout>
-
-#include "addpassworddialog.h"
-#include "utils/layout.h"
-#include <settings/settingsmanager.h>
-
 PasswordCard::PasswordCard(const PasswordEntry &entry, QWidget *parent)
     : QFrame(parent), m_entry(entry) {
   setupUI();
@@ -199,7 +181,7 @@ void PasswordCard::showEditDialog() {
   dialog.setWindowTitle("Edit Entry");
   if (dialog.exec() == QDialog::Accepted) {
     PasswordEntry updated = dialog.getPasswordEntry(m_entry.id);
-    updated.timestamp = QDateTime::currentDateTime();
+    updated.createdAt = m_entry.createdAt;
 
     // this will handle update of the card
     // in password manager
@@ -212,7 +194,6 @@ void PasswordCard::showDuplicateDialog() {
   dialog.setWindowTitle("Edit as New Entry");
   if (dialog.exec() == QDialog::Accepted) {
     PasswordEntry updated = dialog.getPasswordEntry();
-    updated.timestamp = QDateTime::currentDateTime();
 
     emit entryDuplicated(updated);
   }
@@ -229,8 +210,11 @@ void PasswordCard::showFullDetailsDialog() {
   QGridLayout *grid = new QGridLayout(scrollWidget);
 
   QLocale locale;
-  QString formattedDate =
-      locale.toString(m_entry.timestamp, QLocale::LongFormat);
+  QString createdDateTime =
+      locale.toString(m_entry.createdAt, QLocale::LongFormat);
+
+  QString updatedDateTime =
+      locale.toString(m_entry.updatedAt, QLocale::LongFormat);
 
   auto addRow = [&](int row, const QString &label, const QString &value) {
     if (value.isEmpty())
@@ -252,7 +236,8 @@ void PasswordCard::showFullDetailsDialog() {
   addRow(row++, "Category", m_entry.category);
   addRow(row++, "URL", m_entry.url);
   addRow(row++, "Notes", m_entry.notes);
-  addRow(row++, "Added On", formattedDate);
+  addRow(row++, "Added On", createdDateTime);
+  addRow(row++, "Updated On", updatedDateTime);
   grid->setRowStretch(row, 1);
 
   scrollWidget->setLayout(grid);

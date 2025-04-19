@@ -1,32 +1,18 @@
 #ifndef PASSWORDWORKER_H
 #define PASSWORDWORKER_H
 
-#include <QDateTime>
+#include "passwordentry.h"
+
+#include <QFrame>
+#include <QLabel>
 #include <QObject>
 #include <QReadWriteLock>
-#include <QUuid>
-#include <QVector>
+#include <QToolButton>
 
 struct PasswordEntry;
 
 Q_DECLARE_METATYPE(PasswordEntry)
 Q_DECLARE_METATYPE(QVector<PasswordEntry>)
-
-struct PasswordEntry {
-  // basic fields
-  QUuid id;
-  QString title;
-  QString username;
-  QString password;
-  QDateTime timestamp;
-
-  // extended fields
-  QString url;
-  QString notes;
-  QString category;
-
-  PasswordEntry() : id(QUuid::createUuid()) {}
-};
 
 class PasswordWorker : public QObject {
   Q_OBJECT

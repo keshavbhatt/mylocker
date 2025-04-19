@@ -1,12 +1,25 @@
 #ifndef PASSWORDCARD_H
 #define PASSWORDCARD_H
 
-#include "passwordworker.h"
-
+#include <QApplication>
+#include <QClipboard>
+#include <QDesktopServices>
+#include <QDialog>
 #include <QFrame>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QTimer>
 #include <QToolButton>
-#include <QUuid>
+#include <QToolTip>
+#include <QVBoxLayout>
+
+#include "addpassworddialog.h"
+#include "passwordentry.h"
+#include "utils/layout.h"
+#include <settings/settingsmanager.h>
 
 class PasswordCard : public QFrame {
   Q_OBJECT
