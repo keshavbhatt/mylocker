@@ -3,15 +3,17 @@
 
 #include <QDateTime>
 #include <QString>
+#include <QUuid>
 
 struct NoteEntry {
-  QString id;
+  QUuid id;
   QString title;
   QString content;
   QDateTime createdAt;
   QDateTime updatedAt;
 
-  static NoteEntry create(const QString &title, const QString &content);
+  static NoteEntry()
+      : id(QUuid::createUuid()), createdAt(QDateTime::currentDateTime()) {}
 };
 
 #endif // NOTEENTRY_H
