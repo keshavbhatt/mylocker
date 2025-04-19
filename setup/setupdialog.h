@@ -1,9 +1,19 @@
 #ifndef SETUPDIALOG_H
 #define SETUPDIALOG_H
 
-#include "newuserpage.h"
-
+#include <QAction>
 #include <QDialog>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSettings>
+
+#include "newuserpage.h"
+#include <icons/iconloader.h>
+#include <security-manager/securitymanager.h>
+#include <theme/palette.h>
+#include <vault/vault.h>
+#include <vault/vaultmanager.h>
+#include <vault/vaultselectiondialog.h>
 
 namespace Ui {
 class SetupDialog;

@@ -1,16 +1,5 @@
 #include "managelocker.h"
 #include "ui_managelocker.h"
-#include "vaultcreationdialog.h"
-
-#include <QDir>
-#include <QInputDialog>
-#include <QMessageBox>
-#include <QSettings>
-
-#include <icons/iconloader.h>
-#include <icons/iconpickerdialog.h>
-
-#include <theme/palette.h>
 
 ManageLocker::ManageLocker(const QString &lockerDataDirPath, QWidget *parent)
     : QWidget(parent), m_lockerDataDirPath(lockerDataDirPath),
@@ -102,8 +91,8 @@ void ManageLocker::editSelectedVault() {
     return;
   }
 
-  QString vaultPath = QDir(m_lockerDataDirPath).filePath(selectedVault);
-  QSettings metaSettings(vaultPath + "/.vault.meta", QSettings::IniFormat);
+  QString oldVaultPath = QDir(m_lockerDataDirPath).filePath(selectedVault);
+  QSettings metaSettings(oldVaultPath + "/.vault.meta", QSettings::IniFormat);
   QString icon = metaSettings.value("Vault/icon").toString();
   QColor color(metaSettings.value("Vault/color").toString());
 
@@ -113,8 +102,36 @@ void ManageLocker::editSelectedVault() {
   dlg.setIconAndIconColor(color, icon);
 
   if (dlg.exec() == QDialog::Accepted) {
-    metaSettings.setValue("Vault/icon", dlg.selectedIcon());
-    metaSettings.setValue("Vault/color", dlg.selectedColor().name());
+    QString newVaultName = dlg.vaultName().trimmed();
+
+    if (newVaultName.isEmpty()) {
+      QMessageBox::warning(this, tr("Invalid Name"),
+                           tr("Vault name cannot be empty."));
+      return;
+    }
+
+    if (newVaultName != selectedVault) {
+      QString newVaultPath = QDir(m_lockerDataDirPath).filePath(newVaultName);
+      if (QFileInfo::exists(newVaultPath)) {
+        QMessageBox::critical(this, tr("Name Conflict"),
+                              tr("A vault with the new name already exists."));
+        return;
+      }
+
+      QDir lockerDir(m_lockerDataDirPath);
+      if (!lockerDir.rename(selectedVault, newVaultName)) {
+        QMessageBox::critical(this, tr("Rename Failed"),
+                              tr("Failed to rename the vault folder."));
+        return;
+      }
+    }
+
+    QString updatedVaultPath = QDir(m_lockerDataDirPath).filePath(newVaultName);
+    QSettings updatedMeta(updatedVaultPath + "/.vault.meta",
+                          QSettings::IniFormat);
+    updatedMeta.setValue("Vault/icon", dlg.selectedIcon());
+    updatedMeta.setValue("Vault/color", dlg.selectedColor().name());
+
     vaultListWidget->loadFromDirectory(m_lockerDataDirPath);
   }
 }

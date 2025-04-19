@@ -3,6 +3,14 @@
 
 #include <QWidget>
 
+#include "vaultcreationdialog.h"
+#include <QDir>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QSettings>
+#include <icons/iconloader.h>
+#include <icons/iconpickerdialog.h>
+#include <theme/palette.h>
 #include <vault/vaultlistwidget.h>
 
 namespace Ui {

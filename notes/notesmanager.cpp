@@ -13,7 +13,7 @@ NotesManager::NotesManager(QWidget *parent)
 
   ui->backToDashboardButton->setIconSize(QSize(22, 22));
   ui->backToDashboardButton->setIcon(Utils::IconLoader::loadColoredIcon(
-      "arrow-left-circle-fill", Palette::iconPrimary()));
+      "arrow-left-circle-fill", Palette::iconDefault()));
   connect(ui->backToDashboardButton, &QPushButton::clicked, this,
           &NotesManager::goToDashboard);
 

@@ -15,6 +15,10 @@
 
 #include <help/whatsthishoverfilter.h>
 
+#include <icons/iconloader.h>
+
+#include <theme/palette.h>
+
 NewUserPage::NewUserPage(QWidget *parent)
     : QWidget(parent), ui(new Ui::NewUserPage) {
   ui->setupUi(this);
@@ -22,13 +26,15 @@ NewUserPage::NewUserPage(QWidget *parent)
   WhatsThisHoverFilter *hoverFilter = new WhatsThisHoverFilter(this);
   WhatsThisHoverFilter::installWhatsThisHoverFilter(this, hoverFilter);
 
+  ui->backToWelcomePageBtn->setIcon(Utils::IconLoader::loadColoredIcon(
+      "arrow-left-circle-fill", Palette::iconDefault()));
   connect(ui->backToWelcomePageBtn, &QPushButton::clicked, this,
           [=]() { emit backToWelcomePageRequested(); });
 
   QAction *selectNewDataDirectoryAction = new QAction(this);
   selectNewDataDirectoryAction->setText("Click to Select new Locker Directory");
-  selectNewDataDirectoryAction->setIcon(
-      QIcon(":/icons/svg/folder-open-line.svg"));
+  selectNewDataDirectoryAction->setIcon(Utils::IconLoader::loadColoredIcon(
+      "folder-open-line", Palette::iconDefault()));
 
   ui->newDataDirectoryLineEdit->installEventFilter(this);
   ui->newDataDirectoryLineEdit->setReadOnly(true);
@@ -40,6 +46,8 @@ NewUserPage::NewUserPage(QWidget *parent)
   connect(ui->confirmMasterPasswordLineEdit, &QLineEdit::returnPressed, this,
           &NewUserPage::validateAndContinueSetup);
 
+  ui->continuePushButton->setIcon(Utils::IconLoader::loadColoredIcon(
+      "arrow-right-circle-fill", Palette::iconDefault()));
   connect(ui->continuePushButton, &QPushButton::clicked, this,
           &NewUserPage::validateAndContinueSetup);
 }

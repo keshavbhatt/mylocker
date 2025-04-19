@@ -1,17 +1,6 @@
 #include "setupdialog.h"
 #include "ui_setupdialog.h"
 
-#include <QAction>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QSettings>
-
-#include <security-manager/securitymanager.h>
-
-#include <vault/vault.h>
-#include <vault/vaultmanager.h>
-#include <vault/vaultselectiondialog.h>
-
 SetupDialog::SetupDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::SetupDialog) {
   ui->setupUi(this);
@@ -26,9 +15,13 @@ SetupDialog::SetupDialog(QWidget *parent)
 
   ui->stackedWidget->addWidget(newUserPage);
 
+  ui->existingDir->setIcon(Utils::IconLoader::loadColoredIcon(
+      "folder-keyhole-fill", Palette::iconDefault()));
   connect(ui->existingDir, &QPushButton::clicked, this,
           &SetupDialog::handleExistingDataDirectorySelection);
 
+  ui->newUser->setIcon(Utils::IconLoader::loadColoredIcon(
+      "shield-cross-fill", Palette::iconDefault()));
   connect(ui->newUser, &QPushButton::clicked, this,
           [=]() { ui->stackedWidget->slideInWgt(newUserPage); });
 
@@ -69,7 +62,6 @@ void SetupDialog::handleExistingDataDirectorySelection() {
       return;
     }
 
-    // Persist the path
     QSettings settings;
     settings.setValue("lockerDataDirPath", existingDataDirectoryPath);
     accept();

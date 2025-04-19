@@ -15,7 +15,7 @@ QColor Palette::surface() { return QColor("#FFFFFF"); }
 QColor Palette::textPrimary() { return QColor("#212121"); }
 QColor Palette::textSecondary() { return QColor("#757575"); }
 
-QColor Palette::iconDefault() { return QColor("#424242"); } // Neutral gray
+QColor Palette::iconDefault() { return QColor("#9fa0a4"); } // Neutral gray
 QColor Palette::iconSuccess() { return success(); }
 QColor Palette::iconWarning() { return warning(); }
 QColor Palette::iconError() { return error(); }
