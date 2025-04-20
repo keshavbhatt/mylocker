@@ -2,6 +2,8 @@
 #define PASSWORDSTORAGE_H
 
 #include <QObject>
+#include <QThread>
+
 #include <password/passwordworker.h>
 
 class PasswordStorage : public QObject {

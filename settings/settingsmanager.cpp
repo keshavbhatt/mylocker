@@ -60,3 +60,9 @@ QString SettingsManager::getPasswordStorageFilePath() const {
   QString fullPath = baseDirPath + QDir::separator() + "passwords.dat";
   return fullPath;
 }
+
+QString SettingsManager::getNoteStorageFilePath() const {
+  const QString baseDirPath = VaultManager::instance().currentVaultDir();
+  QString fullPath = baseDirPath + QDir::separator() + "notes.dat";
+  return fullPath;
+}

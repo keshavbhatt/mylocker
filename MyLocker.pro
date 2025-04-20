@@ -61,6 +61,10 @@ SOURCES += \
     locker/managelocker.cpp \
     locker/vaultcreationdialog.cpp \
     login/autolockmanager.cpp \
+    notes/addnotedialog.cpp \
+    notes/notecard.cpp \
+    notes/noteworker.cpp \
+    notes/storage/notesstorage.cpp \
     password/addpassworddialog.cpp \
     password/passwordcard.cpp \
     password/passwordgenerator.cpp \
@@ -92,7 +96,11 @@ HEADERS += \
     locker/managelocker.h \
     locker/vaultcreationdialog.h \
     login/autolockmanager.h \
+    notes/addnotedialog.h \
+    notes/notecard.h \
     notes/noteentry.h \
+    notes/noteworker.h \
+    notes/storage/notesstorage.h \
     password/addpassworddialog.h \
     password/passwordcard.h \
     password/passwordentry.h \

@@ -1,6 +1,9 @@
 #ifndef CATEGORYMANAGER_H
 #define CATEGORYMANAGER_H
 
+#include <algorithm>
+#include <settings/settingsmanager.h>
+
 #include <QMap>
 #include <QString>
 #include <QVector>
@@ -12,6 +15,8 @@ public:
   QVector<QString> getCategories() const;
   void addCategory(const QString &category);
   bool removeCategory(const QString &category);
+
+  QString defaultCategory() const;
 
 private:
   CategoryManager();

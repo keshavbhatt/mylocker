@@ -12,7 +12,10 @@ struct NoteEntry {
   QDateTime createdAt;
   QDateTime updatedAt;
 
-  static NoteEntry()
+  // extended fields
+  QString category;
+
+  NoteEntry()
       : id(QUuid::createUuid()), createdAt(QDateTime::currentDateTime()) {}
 };
 

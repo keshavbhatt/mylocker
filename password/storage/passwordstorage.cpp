@@ -1,8 +1,5 @@
 #include "passwordstorage.h"
 
-#include "passwordstorage.h"
-#include <QThread>
-
 PasswordStorage &PasswordStorage::instance() {
   static PasswordStorage instance;
   return instance;

@@ -1,7 +1,5 @@
 #include "categorymanager.h"
 
-#include <settings/settingsmanager.h>
-
 CategoryManager &CategoryManager::instance() {
   static CategoryManager instance;
   return instance;
@@ -9,7 +7,7 @@ CategoryManager &CategoryManager::instance() {
 
 CategoryManager::CategoryManager() { loadCategories(); }
 
-#include <algorithm>
+QString CategoryManager::defaultCategory() const { return "Other"; }
 
 void CategoryManager::loadCategories() {
   categories = presetCategories;

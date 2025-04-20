@@ -1,19 +1,24 @@
-#include "passwordworker.h"
+#include "noteworker.h"
+
+#include <security-manager/securitymanager.h>
+
+#include <settings/settingsmanager.h>
+
+#include <encryptor/encryptor.h>
 
 #include <categories/categorymanager.h>
 
-// NOTE:Do not remove, update when format change
-// version handling for backward compatibility
-static const quint32 PASSWORD_MAGIC = 0x4E0E4E0E;
-static const quint32 PASSWORD_VERSION = 1;
+// NOTE:Do not remove, update when format changes
+static const quint32 NOTE_MAGIC = 0x4E0E4E0E;
+static const quint32 NOTE_VERSION = 1;
 
-PasswordWorker::PasswordWorker(QObject *parent) : QObject(parent) {}
+NoteWorker::NoteWorker(QObject *parent) : QObject(parent) {}
 
-void PasswordWorker::addEntry(const PasswordEntry &entry) {
+void NoteWorker::addEntry(const NoteEntry &entry) {
   QWriteLocker locker(&m_lock);
   auto entries = loadInternal();
 
-  PasswordEntry newEntry = entry;
+  NoteEntry newEntry = entry;
 
   if (newEntry.category.trimmed().isEmpty()) {
     newEntry.category = CategoryManager::instance().defaultCategory();
@@ -26,22 +31,21 @@ void PasswordWorker::addEntry(const PasswordEntry &entry) {
   entries.append(newEntry);
 
   if (!saveInternal(entries)) {
-    emit errorOccurred("Failed to save password entry");
+    emit errorOccurred("Failed to save note entry");
+    return;
   }
 
-  emit passwordAdded(newEntry);
+  emit noteAdded(newEntry);
 }
 
-void PasswordWorker::deleteEntry(QUuid id) {
+void NoteWorker::deleteEntry(QUuid id) {
   QWriteLocker locker(&m_lock);
   auto entries = loadInternal();
 
-  auto it =
-      std::remove_if(entries.begin(), entries.end(),
-                     [&id](const PasswordEntry &e) { return e.id == id; });
-
+  auto it = std::remove_if(entries.begin(), entries.end(),
+                           [&id](const NoteEntry &e) { return e.id == id; });
   if (it == entries.end()) {
-    emit deletionFailed("Entry not found");
+    emit deletionFailed("Note not found");
     return;
   }
 
@@ -55,7 +59,7 @@ void PasswordWorker::deleteEntry(QUuid id) {
   emit entryDeleted(id);
 }
 
-void PasswordWorker::updateEntry(const PasswordEntry &updatedEntry) {
+void NoteWorker::updateEntry(const NoteEntry &updatedEntry) {
   QWriteLocker locker(&m_lock);
   auto entries = loadInternal();
 
@@ -63,11 +67,8 @@ void PasswordWorker::updateEntry(const PasswordEntry &updatedEntry) {
   for (auto &entry : entries) {
     if (entry.id == updatedEntry.id) {
       entry.title = updatedEntry.title;
-      entry.username = updatedEntry.username;
-      entry.password = updatedEntry.password;
+      entry.content = updatedEntry.content;
       entry.updatedAt = QDateTime::currentDateTime();
-      entry.url = updatedEntry.url;
-      entry.notes = updatedEntry.notes;
       entry.category = updatedEntry.category;
       found = true;
       break;
@@ -75,25 +76,25 @@ void PasswordWorker::updateEntry(const PasswordEntry &updatedEntry) {
   }
 
   if (!found) {
-    emit errorOccurred("Entry not found for update");
+    emit errorOccurred("Note not found for update");
     return;
   }
 
   if (!saveInternal(entries)) {
-    emit errorOccurred("Failed to save updated entry");
+    emit errorOccurred("Failed to save updated note");
     return;
   }
 
-  emit passwordUpdated(updatedEntry);
+  emit noteUpdated(updatedEntry);
 }
 
-void PasswordWorker::loadEntries() {
+void NoteWorker::loadEntries() {
   QReadLocker locker(&m_lock);
   emit entriesLoaded(loadInternal());
 }
 
-QVector<PasswordEntry> PasswordWorker::loadInternal() {
-  QVector<PasswordEntry> entries;
+QVector<NoteEntry> NoteWorker::loadInternal() {
+  QVector<NoteEntry> entries;
 
   QByteArray key, iv;
   if (!SecurityManager::getSessionKey(key, iv)) {
@@ -101,10 +102,10 @@ QVector<PasswordEntry> PasswordWorker::loadInternal() {
     return entries;
   }
 
-  QFile file(SettingsManager::instance().getPasswordStorageFilePath());
+  QFile file(SettingsManager::instance().getNoteStorageFilePath());
   if (!file.open(QIODevice::ReadOnly)) {
     if (file.exists()) {
-      emit errorOccurred("Failed to open password file: " + file.errorString());
+      emit errorOccurred("Failed to open note file: " + file.errorString());
     }
     return entries;
   }
@@ -113,8 +114,8 @@ QVector<PasswordEntry> PasswordWorker::loadInternal() {
   quint32 magic, version;
   in >> magic >> version;
 
-  if (magic != PASSWORD_MAGIC) {
-    emit errorOccurred("Invalid password file format");
+  if (magic != NOTE_MAGIC) {
+    emit errorOccurred("Invalid note file format");
     return entries;
   }
 
@@ -125,10 +126,9 @@ QVector<PasswordEntry> PasswordWorker::loadInternal() {
     QByteArray decryptedBytes = Encryptor::decrypt(encrypted, key, iv);
     QDataStream entryIn(&decryptedBytes, QIODevice::ReadOnly);
 
-    PasswordEntry entry;
-    entryIn >> entry.id >> entry.title >> entry.username >> entry.password >>
-        entry.createdAt >> entry.updatedAt >> entry.url >> entry.notes >>
-        entry.category;
+    NoteEntry entry;
+    entryIn >> entry.id >> entry.title >> entry.content >> entry.createdAt >>
+        entry.updatedAt >> entry.category;
 
     if (!entry.id.isNull() && !entry.title.isEmpty()) {
       entries.append(entry);
@@ -138,14 +138,14 @@ QVector<PasswordEntry> PasswordWorker::loadInternal() {
   return entries;
 }
 
-bool PasswordWorker::saveInternal(const QVector<PasswordEntry> &entries) {
+bool NoteWorker::saveInternal(const QVector<NoteEntry> &entries) {
   QByteArray key, iv;
   if (!SecurityManager::getSessionKey(key, iv)) {
     emit errorOccurred("Encryption key not available");
     return false;
   }
 
-  QSaveFile file(SettingsManager::instance().getPasswordStorageFilePath());
+  QSaveFile file(SettingsManager::instance().getNoteStorageFilePath());
   if (!file.open(QIODevice::WriteOnly)) {
     emit errorOccurred("Failed to open file for writing: " +
                        file.errorString());
@@ -153,21 +153,20 @@ bool PasswordWorker::saveInternal(const QVector<PasswordEntry> &entries) {
   }
 
   QDataStream out(&file);
-  out << PASSWORD_MAGIC << PASSWORD_VERSION;
+  out << NOTE_MAGIC << NOTE_VERSION;
 
-  for (const PasswordEntry &entry : entries) {
+  for (const NoteEntry &entry : entries) {
     QByteArray serialized;
     QDataStream entryOut(&serialized, QIODevice::WriteOnly);
-    entryOut << entry.id << entry.title << entry.username << entry.password
-             << entry.createdAt << entry.updatedAt << entry.url << entry.notes
-             << entry.category;
+    entryOut << entry.id << entry.title << entry.content << entry.createdAt
+             << entry.updatedAt << entry.category;
 
     QByteArray encrypted = Encryptor::encrypt(serialized, key, iv);
     out << encrypted;
   }
 
   if (!file.commit()) {
-    emit errorOccurred("Failed to save passwords: " + file.errorString());
+    emit errorOccurred("Failed to save notes: " + file.errorString());
     return false;
   }
 

@@ -1,12 +1,21 @@
 #ifndef PASSWORDWORKER_H
 #define PASSWORDWORKER_H
 
+#include "encryptor/encryptor.h"
 #include "passwordentry.h"
+#include <security-manager/securitymanager.h>
+#include <settings/settingsmanager.h>
 
+#include <QDataStream>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
 #include <QFrame>
 #include <QLabel>
 #include <QObject>
 #include <QReadWriteLock>
+#include <QSaveFile>
+#include <QStandardPaths>
 #include <QToolButton>
 
 struct PasswordEntry;

@@ -17,6 +17,8 @@ public:
 
   QString getPasswordStorageFilePath() const;
 
+  QString getNoteStorageFilePath() const;
+
   int getClipboardClearDelay() const;
 
 private:

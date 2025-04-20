@@ -63,6 +63,7 @@ PasswordManager::~PasswordManager() {
 
 void PasswordManager::stressTest() {
   QString currentVaultName = VaultManager::instance().currentVault().name();
+
   for (int i = 0; i < 500; ++i) {
     PasswordEntry entry;
     entry.category = "Other";
@@ -71,6 +72,7 @@ void PasswordManager::stressTest() {
     entry.title = QString("google %1 in %2").arg(i).arg(currentVaultName);
     entry.url = "gmail.com";
     entry.username = QString("user %1").arg(i);
+
     PasswordStorage::instance().addPasswordEntry(entry);
   }
 }
