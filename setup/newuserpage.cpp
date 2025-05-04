@@ -128,7 +128,7 @@ void NewUserPage::validateAndContinueSetup() {
 
   // Path was created by VaultManager, save it
   QSettings settings;
-  settings.setValue("lockerDataDirPath", newDataDirectoryPath);
+  settings.setValue("lastOpenedLockerDirPath", newDataDirectoryPath);
 
   emit setupComplete();
 }

@@ -63,7 +63,7 @@ void SetupDialog::handleExistingDataDirectorySelection() {
     }
 
     QSettings settings;
-    settings.setValue("lockerDataDirPath", existingDataDirectoryPath);
+    settings.setValue("lastOpenedLockerDirPath", existingDataDirectoryPath);
     accept();
   }
 }

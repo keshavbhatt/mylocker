@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   QApplication::setApplicationVersion(VERSIONSTR);
 
   QSettings settings;
-  QString lockerDataDirPath = settings.value("lockerDataDirPath").toString();
+  QString lockerDataDirPath = settings.value("lastOpenedLockerDirPath").toString();
 
   if (lockerDataDirPath.isNull() || lockerDataDirPath.trimmed().isEmpty()) {
     SetupDialog setupDialog;

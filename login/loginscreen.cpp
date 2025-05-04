@@ -56,7 +56,7 @@ void LoginScreen::onUnlockClicked() {
 
     Vault newVault(m_vaultListWidget->selectedVaultName());
 
-    auto lockerDataDirPath = m_settings.value("lockerDataDirPath").toString();
+    auto lockerDataDirPath = m_settings.value("lastOpenedLockerDirPath").toString();
 
     if (!VaultManager::instance().openVault(newVault, lockerDataDirPath)) {
       QMessageBox::critical(this, "Error", "Failed to open vault.");
@@ -78,7 +78,7 @@ void LoginScreen::onManageLockerClicked() {
   }
 
   if (SecurityManager::validateMasterPassword(password)) {
-    auto lockerDataDirPath = m_settings.value("lockerDataDirPath").toString();
+    auto lockerDataDirPath = m_settings.value("lastOpenedLockerDirPath").toString();
     ui->passwordInput->clear();
     ui->errorLabel->hide();
     openManageLocker(lockerDataDirPath);
@@ -139,7 +139,7 @@ void LoginScreen::loadVaults() {
     connect(m_vaultListWidget, &VaultListWidget::vaultSelectionChanged, this,
             &LoginScreen::vaultSelectionChanged);
   }
-  auto lockerDataDirPath = m_settings.value("lockerDataDirPath").toString();
+  auto lockerDataDirPath = m_settings.value("lastOpenedLockerDirPath").toString();
 
   m_vaultListWidget->loadFromDirectory(lockerDataDirPath);
   ui->vaultWidget->setVisible(true);
