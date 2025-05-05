@@ -12,6 +12,8 @@
 #include <icons/iconloader.h>
 #include <icons/iconpickerdialog.h>
 
+#include <vault/vault.h>
+
 VaultCreationDialog::VaultCreationDialog(QWidget *parent)
     : QDialog(parent), m_selectedColor(Palette::iconSuccess()) {
 
@@ -30,9 +32,9 @@ VaultCreationDialog::VaultCreationDialog(QWidget *parent)
   m_iconPreviewLabel = new QLabel(this);
   m_iconPreviewLabel->setFixedSize(32, 32);
 
-  m_selectedColor = Palette::iconPrimary(); // default icon color
-  m_selectedIcon = "dv-line";               // default icon
-  updateIconPreview();                      // default blank preview
+  m_selectedColor = Vault::defaultColor(); // default icon color
+  m_selectedIcon = Vault::defaultIcon();   // default icon
+  updateIconPreview();                     // default blank preview
 
   auto formLayout = new QVBoxLayout;
   formLayout->addWidget(new QLabel("Vault Name:"));

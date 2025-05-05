@@ -26,6 +26,10 @@ NewUserPage::NewUserPage(QWidget *parent)
   WhatsThisHoverFilter *hoverFilter = new WhatsThisHoverFilter(this);
   WhatsThisHoverFilter::installWhatsThisHoverFilter(this, hoverFilter);
 
+  ui->newDataDirectoryLineEdit->setPlaceholderText(
+      "Click to select new Locker directory");
+  ui->newVaultNameLineEdit->setPlaceholderText("e.g Work");
+
   ui->backToWelcomePageBtn->setIcon(Utils::IconLoader::loadColoredIcon(
       "arrow-left-circle-fill", Palette::iconDefault()));
   connect(ui->backToWelcomePageBtn, &QPushButton::clicked, this,
@@ -116,8 +120,8 @@ void NewUserPage::validateAndContinueSetup() {
   }
 
   // Create Vault
-  Vault newVault(newVaultName);
-  if (!VaultManager::instance().openVault(newVault, newDataDirectoryPath)) {
+  Vault newVault(newDataDirectoryPath + QDir::separator() + newVaultName);
+  if (!VaultManager::instance().openVault(newVault)) {
     QMessageBox::critical(this, "Error",
                           QString("Failed to open Vault " + newVaultName));
     return;

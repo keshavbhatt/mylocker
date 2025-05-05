@@ -15,7 +15,8 @@ SettingsManager &SettingsManager::instance() {
 }
 
 void SettingsManager::updateStoragePath() {
-  QString newPath = VaultManager::instance().lockerDataDirPath() +
+
+  QString newPath = VaultManager::instance().currentVault().lockerDirPath() +
                     QDir::separator() + ".settings.ini";
 
   if (storageFile != newPath) {

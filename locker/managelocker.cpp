@@ -76,7 +76,8 @@ void ManageLocker::createNewVault() {
     return;
   }
 
-  QSettings metaSettings(newVaultPath + "/.vault.meta", QSettings::IniFormat);
+  QSettings metaSettings(newVaultPath + QDir::separator() + ".vault.meta",
+                         QSettings::IniFormat);
   metaSettings.setValue("Vault/icon", dlg.selectedIcon());
   metaSettings.setValue("Vault/color", dlg.selectedColor().name());
 
@@ -92,7 +93,8 @@ void ManageLocker::editSelectedVault() {
   }
 
   QString oldVaultPath = QDir(m_lockerDataDirPath).filePath(selectedVault);
-  QSettings metaSettings(oldVaultPath + "/.vault.meta", QSettings::IniFormat);
+  QSettings metaSettings(oldVaultPath + QDir::separator() + ".vault.meta",
+                         QSettings::IniFormat);
   QString icon = metaSettings.value("Vault/icon").toString();
   QColor color(metaSettings.value("Vault/color").toString());
 
@@ -127,7 +129,7 @@ void ManageLocker::editSelectedVault() {
     }
 
     QString updatedVaultPath = QDir(m_lockerDataDirPath).filePath(newVaultName);
-    QSettings updatedMeta(updatedVaultPath + "/.vault.meta",
+    QSettings updatedMeta(updatedVaultPath + QDir::separator() + ".vault.meta",
                           QSettings::IniFormat);
     updatedMeta.setValue("Vault/icon", dlg.selectedIcon());
     updatedMeta.setValue("Vault/color", dlg.selectedColor().name());
@@ -150,7 +152,7 @@ void ManageLocker::deleteSelectedVault() {
       QMessageBox::Yes | QMessageBox::No);
 
   if (confirm == QMessageBox::Yes) {
-    QDir vaultDir(m_lockerDataDirPath + "/" + selectedVault);
+    QDir vaultDir(m_lockerDataDirPath + QDir::separator() + selectedVault);
     if (vaultDir.removeRecursively()) {
       vaultListWidget->loadFromDirectory(m_lockerDataDirPath); // Refresh list
     } else {

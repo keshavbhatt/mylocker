@@ -54,11 +54,13 @@ void LoginScreen::onUnlockClicked() {
   if (SecurityManager::validateMasterPassword(password)) {
     ui->passwordInput->clear();
 
-    Vault newVault(m_vaultListWidget->selectedVaultName());
+    auto lockerDataDirPath =
+        m_settings.value("lastOpenedLockerDirPath").toString();
 
-    auto lockerDataDirPath = m_settings.value("lastOpenedLockerDirPath").toString();
+    Vault newVault(lockerDataDirPath + QDir::separator() +
+                   m_vaultListWidget->selectedVaultName());
 
-    if (!VaultManager::instance().openVault(newVault, lockerDataDirPath)) {
+    if (!VaultManager::instance().openVault(newVault)) {
       QMessageBox::critical(this, "Error", "Failed to open vault.");
       return;
     }
@@ -78,7 +80,8 @@ void LoginScreen::onManageLockerClicked() {
   }
 
   if (SecurityManager::validateMasterPassword(password)) {
-    auto lockerDataDirPath = m_settings.value("lastOpenedLockerDirPath").toString();
+    auto lockerDataDirPath =
+        m_settings.value("lastOpenedLockerDirPath").toString();
     ui->passwordInput->clear();
     ui->errorLabel->hide();
     openManageLocker(lockerDataDirPath);
@@ -139,14 +142,17 @@ void LoginScreen::loadVaults() {
     connect(m_vaultListWidget, &VaultListWidget::vaultSelectionChanged, this,
             &LoginScreen::vaultSelectionChanged);
   }
-  auto lockerDataDirPath = m_settings.value("lastOpenedLockerDirPath").toString();
+  auto lockerDataDirPath =
+      m_settings.value("lastOpenedLockerDirPath").toString();
 
   m_vaultListWidget->loadFromDirectory(lockerDataDirPath);
   ui->vaultWidget->setVisible(true);
 
+  Vault newVault(lockerDataDirPath + QDir::separator() +
+                 m_vaultListWidget->selectedVaultName());
+
   // temporary open the vault to allow password varification
-  Vault newVault(m_vaultListWidget->selectedVaultName());
-  if (!VaultManager::instance().openVault(newVault, lockerDataDirPath)) {
+  if (!VaultManager::instance().openVault(newVault)) {
     QMessageBox::critical(this, "Error", "Failed to open vault.");
     return;
   }

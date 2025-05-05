@@ -54,10 +54,9 @@ void SetupDialog::handleExistingDataDirectorySelection() {
   VaultSelectionDialog dialog(existingDataDirectoryPath, this);
   if (dialog.exec() == QDialog::Accepted) {
     QString vaultName = dialog.selectedVaultName();
-    Vault newVault(vaultName);
+    Vault newVault(existingDataDirectoryPath + QDir::separator() + vaultName);
 
-    if (!VaultManager::instance().openVault(newVault,
-                                            existingDataDirectoryPath)) {
+    if (!VaultManager::instance().openVault(newVault)) {
       QMessageBox::critical(this, "Error", "Failed to open vault.");
       return;
     }
