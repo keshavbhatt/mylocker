@@ -24,7 +24,6 @@ bool VaultManager::openVault(const Vault &vault) {
 
   if (hasOpenVault()) {
     QSettings settings;
-    settings.setValue("lastOpenedVaultPath", vault.path());
     settings.setValue("lastOpenedVaultName", vault.name());
   }
   return true;
