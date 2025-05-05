@@ -1,6 +1,7 @@
 #include "vaultlistwidget.h"
 
 #include "icons/iconloader.h"
+#include "vault.h"
 #include <QDir>
 #include <QFileInfoList>
 #include <QLabel>
@@ -41,15 +42,11 @@ void VaultListWidget::loadFromDirectory(const QString &directoryPath) {
   for (const QFileInfo &entry : entries) {
     QListWidgetItem *item = new QListWidgetItem(entry.fileName());
 
-    QSettings meta(entry.filePath() + QDir::separator() + ".vault.meta",
-                   QSettings::IniFormat);
-    QString iconName = meta.value("Vault/icon").toString();
-    QString iconColor = meta.value("Vault/color").toString();
+    VaultMeta meta = Vault::loadMeta(entry.filePath());
 
-    if (!iconName.isEmpty()) {
-      QColor color =
-          iconColor.isEmpty() ? Palette::iconDefault() : QColor(iconColor);
-      QIcon icon = Utils::IconLoader::loadColoredIcon(iconName, color);
+    if (!meta.icon.isEmpty()) {
+      QColor color = meta.color.isValid() ? meta.color : Palette::iconDefault();
+      QIcon icon = Utils::IconLoader::loadColoredIcon(meta.icon, color);
       item->setIcon(icon);
     }
 

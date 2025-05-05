@@ -1,6 +1,9 @@
 #include "managelocker.h"
 #include "ui_managelocker.h"
 
+#include <vault/vault.h>
+#include <vault/vaultmanager.h>
+
 ManageLocker::ManageLocker(const QString &lockerDataDirPath, QWidget *parent)
     : QWidget(parent), m_lockerDataDirPath(lockerDataDirPath),
       ui(new Ui::ManageLocker) {
@@ -76,10 +79,8 @@ void ManageLocker::createNewVault() {
     return;
   }
 
-  QSettings metaSettings(newVaultPath + QDir::separator() + ".vault.meta",
-                         QSettings::IniFormat);
-  metaSettings.setValue("Vault/icon", dlg.selectedIcon());
-  metaSettings.setValue("Vault/color", dlg.selectedColor().name());
+  VaultMeta vMeta(dlg.selectedIcon(), dlg.selectedColor());
+  Vault::saveNewVaultMeta(newVaultPath, vMeta);
 
   vaultListWidget->loadFromDirectory(m_lockerDataDirPath); // Refresh list
 }
@@ -93,15 +94,13 @@ void ManageLocker::editSelectedVault() {
   }
 
   QString oldVaultPath = QDir(m_lockerDataDirPath).filePath(selectedVault);
-  QSettings metaSettings(oldVaultPath + QDir::separator() + ".vault.meta",
-                         QSettings::IniFormat);
-  QString icon = metaSettings.value("Vault/icon").toString();
-  QColor color(metaSettings.value("Vault/color").toString());
+
+  VaultMeta meta = Vault::loadMeta(oldVaultPath);
 
   VaultCreationDialog dlg(this);
   dlg.setWindowTitle(tr("Edit Vault"));
   dlg.setVaultName(selectedVault);
-  dlg.setIconAndIconColor(color, icon);
+  dlg.setIconAndIconColor(meta.color, meta.icon);
 
   if (dlg.exec() == QDialog::Accepted) {
     QString newVaultName = dlg.vaultName().trimmed();
@@ -129,10 +128,9 @@ void ManageLocker::editSelectedVault() {
     }
 
     QString updatedVaultPath = QDir(m_lockerDataDirPath).filePath(newVaultName);
-    QSettings updatedMeta(updatedVaultPath + QDir::separator() + ".vault.meta",
-                          QSettings::IniFormat);
-    updatedMeta.setValue("Vault/icon", dlg.selectedIcon());
-    updatedMeta.setValue("Vault/color", dlg.selectedColor().name());
+
+    VaultMeta updatedMeta(dlg.selectedIcon(), dlg.selectedColor());
+    Vault::saveNewVaultMeta(updatedVaultPath, updatedMeta);
 
     vaultListWidget->loadFromDirectory(m_lockerDataDirPath);
   }

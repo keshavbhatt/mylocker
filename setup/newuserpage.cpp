@@ -1,24 +1,6 @@
 #include "newuserpage.h"
 #include "ui_newuserpage.h"
 
-#include <security-manager/securitymanager.h>
-
-#include <QAction>
-#include <QFileDialog>
-#include <QHelpEvent>
-#include <QMessageBox>
-#include <QSettings>
-#include <QToolTip>
-
-#include <vault/vault.h>
-#include <vault/vaultmanager.h>
-
-#include <help/whatsthishoverfilter.h>
-
-#include <icons/iconloader.h>
-
-#include <theme/palette.h>
-
 NewUserPage::NewUserPage(QWidget *parent)
     : QWidget(parent), ui(new Ui::NewUserPage) {
   ui->setupUi(this);
@@ -127,7 +109,6 @@ void NewUserPage::validateAndContinueSetup() {
     return;
   }
 
-  // Save master password
   SecurityManager::setMasterPassword(password);
 
   // Path was created by VaultManager, save it
