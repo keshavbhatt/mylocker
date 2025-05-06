@@ -14,7 +14,7 @@ AddNoteDialog::AddNoteDialog(QWidget *parent) : QDialog(parent) {
   // Content
   QLabel *contentLabel = new QLabel("Content:", this);
   contentInput = new QTextEdit(this);
-  contentInput->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+  contentInput->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   // Category
   QLabel *categoryLabel = new QLabel("Category:", this);
@@ -35,17 +35,16 @@ AddNoteDialog::AddNoteDialog(QWidget *parent) : QDialog(parent) {
   connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
 
   buttonLayout->addStretch();
-  buttonLayout->addWidget(cancelBtn);
   buttonLayout->addWidget(saveBtn);
+  buttonLayout->addWidget(cancelBtn);
 
   // Layout
   mainLayout->addWidget(titleLabel);
   mainLayout->addWidget(titleInput);
   mainLayout->addWidget(contentLabel);
-  mainLayout->addWidget(contentInput);
+  mainLayout->addWidget(contentInput, 1);
   mainLayout->addWidget(categoryLabel);
   mainLayout->addWidget(categoryCombo);
-  mainLayout->addStretch();
   mainLayout->addLayout(buttonLayout);
 }
 
