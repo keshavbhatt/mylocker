@@ -29,6 +29,34 @@ Dashboard::Dashboard(QWidget *parent) : QWidget(parent), ui(new Ui::Dashboard) {
   ui->stackedWidget->setCurrentWidget(ui->mainPage);
 
   installEventFilter(this);
+
+  ui->syncNowButton->setIconSize(QSize(22, 22));
+  ui->syncNowButton->setIcon(Utils::IconLoader::loadColoredIcon(
+      "arrow-up-down-fill", Palette::iconInfo()));
+  m_syncController = new SyncController(
+      VaultManager::instance().currentVault().lockerDirPath(), this);
+  updateSyncNowButton();
+  connect(m_syncController, &SyncController::syncProgress, this,
+          [](const QString &msg) { qDebug() << "Sync progress:" << msg; });
+  connect(m_syncController, &SyncController::syncError, this,
+          [](const QString &err) { qWarning() << "Sync error:" << err; });
+  connect(ui->syncNowButton, &QPushButton::clicked, this, [=]() {
+    if (m_syncController) {
+      m_syncController->syncNow();
+    }
+  });
+}
+
+void Dashboard::updateSyncNowButton() {
+  if (m_syncController) {
+    auto isSyncEnabled = m_syncController->isSyncEnabled();
+
+    ui->syncNowButton->setEnabled(isSyncEnabled);
+    ui->syncNowButton->setToolTip(
+        isSyncEnabled
+            ? QString("Click to Sync to %1").arg(m_syncController->remoteUrl())
+            : "Sync is Disabled");
+  }
 }
 
 bool Dashboard::eventFilter(QObject *watched, QEvent *event) {
@@ -43,7 +71,11 @@ bool Dashboard::eventFilter(QObject *watched, QEvent *event) {
 }
 
 Dashboard::~Dashboard() {
+  delete m_syncController;
+  m_syncController = nullptr;
+
   qDebug() << "Deleted Dashboard";
+
   delete ui;
 }
 

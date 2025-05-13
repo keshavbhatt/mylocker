@@ -5,6 +5,7 @@
 #include <QWidget>
 
 #include <icons/iconloader.h>
+#include <locker/sync/synccontroller.h>
 #include <login/autolockmanager.h>
 #include <notes/notesmanager.h>
 #include <password/passwordmanager.h>
@@ -31,8 +32,11 @@ protected slots:
 
 private:
   Ui::Dashboard *ui;
+  SyncController *m_syncController = nullptr;
   PasswordManager *passwordManager = nullptr;
   NotesManager *notesManager = nullptr;
+
+  void updateSyncNowButton();
 
 private slots:
   void updateAutoLockLabel(int seconds);

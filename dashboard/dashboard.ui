@@ -137,13 +137,6 @@
                <property name="bottomMargin">
                 <number>24</number>
                </property>
-               <item row="1" column="0">
-                <widget class="QPushButton" name="secureNotesButton">
-                 <property name="text">
-                  <string>Notes</string>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="0">
                 <widget class="QPushButton" name="passwordManagerButton">
                  <property name="sizePolicy">
@@ -154,6 +147,13 @@
                  </property>
                  <property name="text">
                   <string>Passwords</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QPushButton" name="secureNotesButton">
+                 <property name="text">
+                  <string>Notes</string>
                  </property>
                 </widget>
                </item>
@@ -204,6 +204,13 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="syncNowButton">
+        <property name="text">
+         <string>Git Sync</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">

@@ -40,7 +40,63 @@ ManageLocker::ManageLocker(const QString &lockerDataDirPath, QWidget *parent)
       "close-circle-fill", Palette::iconError()));
   connect(ui->closeButton, &QPushButton::clicked, this, &ManageLocker::close);
 
+  // Sync controls
+  m_syncController = new SyncController(m_lockerDataDirPath, this);
+
+  bool syncEnabled = m_syncController->isSyncEnabled();
+  QString remoteUrl = m_syncController->remoteUrl();
+  bool isGitRepo = m_syncController->isGitRepo();
+
+  bool isValidSyncState = syncEnabled && !remoteUrl.isEmpty() && isGitRepo;
+  ui->gitClearRemoteUrl->setEnabled(isValidSyncState);
+  ui->gitRemoteUrlLineEdit->setEnabled(isValidSyncState);
+
+  ui->gitSyncCheckBox->setChecked(isValidSyncState);
+  ui->gitRemoteUrlLineEdit->setReadOnly(true);
+  ui->gitRemoteUrlLineEdit->setText(!remoteUrl.isEmpty() ? remoteUrl : "-");
+
+  connect(ui->gitClearRemoteUrl, &QPushButton::clicked, this, [=]() {
+    m_syncController->disableSync();
+    ui->gitSyncCheckBox->setChecked(false);
+    ui->gitRemoteUrlLineEdit->setText("-");
+  });
+
+  connect(ui->gitSyncCheckBox, &QCheckBox::toggled, this,
+          &ManageLocker::onGitSyncToggled);
+
   updateVaultActionButtons();
+}
+
+void ManageLocker::onGitSyncToggled(bool checked) {
+  ui->gitClearRemoteUrl->setEnabled(checked);
+  ui->gitRemoteUrlLineEdit->setEnabled(checked);
+
+  if (checked) {
+    QString remoteUrl = m_syncController->remoteUrl();
+
+    if (remoteUrl.isEmpty()) {
+      remoteUrl = QInputDialog::getText(this, tr("Git Remote URL"),
+                                        tr("Enter remote repository URL:"));
+      if (remoteUrl.isEmpty()) {
+        ui->gitSyncCheckBox->setChecked(false);
+        return;
+      }
+    }
+
+    if (!m_syncController->enableSync(remoteUrl)) {
+      QMessageBox::critical(this, tr("Sync Error"),
+                            tr("Failed to initialize Git repository.\n"
+                               "Please check your remote URL and try again."));
+      ui->gitSyncCheckBox->setChecked(false);
+      ui->gitRemoteUrlLineEdit->setText("-");
+      return;
+    }
+
+    ui->gitRemoteUrlLineEdit->setText(m_syncController->remoteUrl());
+
+  } else {
+    m_syncController->disableSync(false);
+  }
 }
 
 void ManageLocker::updateVaultActionButtons() {

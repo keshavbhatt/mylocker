@@ -59,6 +59,8 @@ SOURCES += \
     icons/iconloader.cpp \
     icons/iconpickerdialog.cpp \
     locker/managelocker.cpp \
+    locker/sync/gitsyncmanager.cpp \
+    locker/sync/synccontroller.cpp \
     locker/vaultcreationdialog.cpp \
     login/autolockmanager.cpp \
     notes/addnotedialog.cpp \
@@ -94,6 +96,8 @@ HEADERS += \
     icons/iconloader.h \
     icons/iconpickerdialog.h \
     locker/managelocker.h \
+    locker/sync/gitsyncmanager.h \
+    locker/sync/synccontroller.h \
     locker/vaultcreationdialog.h \
     login/autolockmanager.h \
     notes/addnotedialog.h \
