@@ -47,7 +47,7 @@
 
 🎥 Watch a quick walkthrough of the application's capabilities (Click the image below to watch on Youtube):
 
-[![YouTube](http://i.ytimg.com/vi/_sv8ORJZ6d0/hqdefault.jpg)](https://www.youtube.com/watch?v=_sv8ORJZ6d0)
+[![YouTube](http://i.ytimg.com/vi/MKacSPxSXEE/hqdefault.jpg)](https://www.youtube.com/watch?v=MKacSPxSXEE)
 
 ---
 
