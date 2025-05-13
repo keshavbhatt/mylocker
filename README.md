@@ -1,6 +1,6 @@
 # MyLocker
 
-**MyLocker** is a secure personal locker built using Qt. It organizes your data into encrypted vaults stored inside a master-password protected **Locker**. MyLocker is completely local – your data never leaves your device.
+**MyLocker** is a secure personal locker built using Qt. It organizes your data into encrypted vaults stored inside a master-password protected **Locker**. MyLocker is completely local – your data never leaves your device (unless you choose to sync via Git).
 
 ---
 
@@ -9,26 +9,35 @@
 - **Locker-Based Architecture** – Organize multiple encrypted vaults within a secure portable Locker.
 - **Master Password Authentication** – Unlock all your data using a single master password.
 - **Multiple Vaults** – Manage several vaults independently inside a single Locker.
-- **Locker Management** – Create or delete vaults within an existing lockers.
+- **Locker Management** – Create or delete vaults within existing lockers.
 - **Configurable Storage Path** – Choose where your locker and vault data is saved.
 - **Auto-Lock** – Automatically locks the application after a period of inactivity for enhanced security.
-- **Local-Only** – No cloud sync or telemetry. Your data stays on your device.
+- **Local-Only by Default** – No cloud sync or telemetry. Your data stays on your device unless Git sync is enabled.
+- **Optional Git Sync** – Link a Git repository to your Locker to sync all vaults securely.
 
 ---
 
-## 🔐 Password Manager (Module inside Locker)
+## 🔐 Password Manager
 
-- **End-to-End Encryption** – All password entries are encrypted locally using AES-256. Nothing is stored in plain text.
+ - **End-to-End Encryption** – All password entries are securely encrypted locally using AES-256 and are stored inside your encrypted vaults.
 - **Clipboard Auto-Clear** – Copied passwords are automatically cleared from the clipboard after a short time.
 - **Search & Filter** – Instantly find entries with live filtering and keyword matching.
 - **Edit & Duplicate Entries** – Easily update or duplicate existing records for convenience.
 
 ---
 
+## 📝 Notes Module
+
+- **Encrypted Notes** – Add simple plaintext notes which are securely encrypted locally using AES-256 and are stored inside your encrypted vaults.
+- **Search & Filter** – Quickly locate notes with live filtering support.
+- **Edit & Duplicate Entries** – Easily update or duplicate existing records for convenience.
+
+---
+
 ## 💡 Coming Soon
 
-- Secure Notes and Other Modules
-- Improved Theme/UX
+- Rich Text Notes with Markdown Support
+- Improved Theme/UX and Accessibility Options
 
 ---
 
