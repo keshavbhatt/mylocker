@@ -22,8 +22,12 @@ void NoteCard::setupUI() {
   auto *cardLayout = new QVBoxLayout(this);
 
   m_titleLabel = new QLabel("<b>" + m_note.title + "</b>", this);
-  m_notePreviewLabel = new QLabel(m_note.content.left(100) + "...", this);
+
+  QString previewText = m_note.content.left(100).simplified();
+  previewText.replace("\n", " ");
+  m_notePreviewLabel = new QLabel(previewText + "...", this);
   m_notePreviewLabel->setWordWrap(true);
+
   m_categoryLabel = new QLabel("Category: " + m_note.category, this);
 
   QToolButton *showFullBtn = new QToolButton(this);
